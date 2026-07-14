@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: garza_limon_postgres
+    environment:
+      - POSTGRES_DB=garza_limon_db
+      - POSTGRES_USER=garza_user
+      - POSTGRES_PASSWORD=garza_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - garza_limon_network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: garza_limon_pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@garzalimon.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - "5050:80"
+    networks:
+      - garza_limon_network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  api:
+    container_name: garza_limon_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - garza_limon_network
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=garza_limon_db
+      - DB_USER=garza_user
+      - DB_PASSWORD=garza_password
+      - PORT=3000
+    command: npx nodemon --legacy-watch bin/www
+    restart: unless-stopped
+
+networks:
+  garza_limon_network:
+    driver: bridge
