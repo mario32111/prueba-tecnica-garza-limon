@@ -69,7 +69,6 @@ class ParkingService {
 
   async findAll(filters = {}) {
     const where = {};
-    const categoryWhere = {};
 
     if (filters.plate) {
       where.plate = { [Op.iLike]: `%${filters.plate}%` };
@@ -77,10 +76,14 @@ class ParkingService {
     if (filters.dateFrom || filters.dateTo) {
       where.entryTime = {};
       if (filters.dateFrom) {
-        where.entryTime[Op.gte] = new Date(filters.dateFrom);
+        const from = new Date(filters.dateFrom);
+        from.setHours(0, 0, 0, 0);
+        where.entryTime[Op.gte] = from;
       }
       if (filters.dateTo) {
-        where.entryTime[Op.lte] = new Date(filters.dateTo);
+        const to = new Date(filters.dateTo);
+        to.setHours(23, 59, 59, 999);
+        where.entryTime[Op.lte] = to;
       }
     }
     if (filters.categoryId) {
@@ -108,9 +111,18 @@ class ParkingService {
       }
     }
 
+    const columnMap = {
+      plate: 'plate',
+      entry_time: 'entryTime',
+      exit_time: 'exitTime',
+      total_cost: 'totalCost',
+      total_minutes: 'totalMinutes',
+    };
+
     let order = [['entryTime', 'DESC']];
     if (filters.sortBy) {
-      order = [[filters.sortBy, filters.sortOrder || 'ASC']];
+      const col = columnMap[filters.sortBy] || filters.sortBy;
+      order = [[col, filters.sortOrder || 'ASC']];
     }
 
     const records = await models.ParkingRecord.findAll({
@@ -164,53 +176,58 @@ class ParkingService {
     const records = await this.findAll(filters);
 
     return new Promise((resolve, reject) => {
-      const doc = new PDFDocument({ margin: 50 });
+      const doc = new PDFDocument({ margin: 40, size: 'letter', layout: 'landscape' });
       const chunks = [];
 
       doc.on('data', (chunk) => chunks.push(chunk));
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       doc.on('error', reject);
 
-      doc.fontSize(18).font('Helvetica-Bold').text('Reporte de Estacionamiento', { align: 'center' });
-      doc.moveDown(0.5);
-      doc.fontSize(10).font('Helvetica').text(`Generado: ${new Date().toLocaleString()}`, { align: 'center' });
+      const startX = 40;
+      const rowHeight = 18;
+      const pageHeight = doc.page.height - 80;
+
+      doc.fontSize(16).font('Helvetica-Bold').text('Reporte de Estacionamiento', { align: 'center' });
+      doc.moveDown(0.3);
+      doc.fontSize(9).font('Helvetica').text(`Generado: ${new Date().toLocaleString()}`, { align: 'center' });
 
       if (plate) {
-        doc.moveDown(0.3);
-        doc.fontSize(12).font('Helvetica-Bold').text(`Vehículo: ${plate}`, { align: 'center' });
+        doc.moveDown(0.2);
+        doc.fontSize(11).font('Helvetica-Bold').text(`Vehículo: ${plate}`, { align: 'center' });
       }
 
-      doc.moveDown(1);
+      doc.moveDown(0.5);
 
       const columns = ['Placa', 'Categoría', 'Entrada', 'Salida', 'Min', 'Costo', 'Estado', 'Registrado'];
-      const colWidths = [70, 80, 100, 100, 40, 50, 60, 90];
-      const startX = 50;
-      const startY = doc.y;
-      const rowHeight = 20;
-      const headerY = doc.y;
+      const colWidths = [65, 75, 110, 110, 40, 55, 55, 90];
 
-      doc.font('Helvetica-Bold').fontSize(9);
-      let x = startX;
-      columns.forEach((col, i) => {
-        doc.text(col, x, headerY, { width: colWidths[i], align: 'center' });
-        x += colWidths[i];
-      });
+      function drawHeader(doc, y) {
+        doc.font('Helvetica-Bold').fontSize(8);
+        let x = startX;
+        columns.forEach((col, i) => {
+          doc.text(col, x, y, { width: colWidths[i], align: 'center', lineBreak: false });
+          x += colWidths[i];
+        });
+        doc.moveTo(startX, y + rowHeight).lineTo(startX + colWidths.reduce((a, b) => a + b, 0), y + rowHeight).stroke();
+        x = startX;
+        colWidths.forEach((w) => {
+          x += w;
+          doc.moveTo(x, y).lineTo(x, y + rowHeight).stroke();
+        });
+      }
 
-      doc.moveTo(startX, headerY + rowHeight).lineTo(startX + colWidths.reduce((a, b) => a + b, 0), headerY + rowHeight).stroke();
-      doc.moveTo(startX, headerY).lineTo(startX, headerY + rowHeight).stroke();
-      x = startX;
-      colWidths.forEach((w) => {
-        x += w;
-        doc.moveTo(x, headerY).lineTo(x, headerY + rowHeight).stroke();
-      });
+      let y = doc.y;
+      drawHeader(doc, y);
+      y += rowHeight;
 
-      doc.font('Helvetica').fontSize(8);
-      let y = headerY + rowHeight;
+      doc.font('Helvetica').fontSize(7);
 
       records.forEach((r, idx) => {
-        if (y > 720) {
+        if (y + rowHeight > pageHeight) {
           doc.addPage();
-          y = 50;
+          y = 40;
+          drawHeader(doc, y);
+          y += rowHeight;
         }
 
         const rowData = [
@@ -225,12 +242,15 @@ class ParkingService {
         ];
 
         if (idx % 2 === 1) {
-          doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), rowHeight).fill('#f5f5f5');
+          doc.fillColor('#f5f5f5').rect(startX, y, colWidths.reduce((a, b) => a + b, 0), rowHeight).fill();
+          doc.fillColor('#000000');
         }
 
-        x = startX;
+        let x = startX;
         rowData.forEach((cell, i) => {
-          doc.text(cell, x, y + 2, { width: colWidths[i], align: 'center' });
+          const text = String(cell);
+          const maxWidth = colWidths[i] - 4;
+          doc.text(text, x, y + 2, { width: maxWidth, align: 'center', lineBreak: false, ellipsis: true });
           x += colWidths[i];
         });
 
