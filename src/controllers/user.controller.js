@@ -56,7 +56,12 @@ class UserController {
   async renderList(req, res, next) {
     try {
       const users = await service.find();
-      res.render('users/list', { users, title: 'Lista de Usuarios' });
+      res.render('users/list', {
+        users,
+        user: req.user,
+        token: req.cookies.token,
+        title: 'Usuarios',
+      });
     } catch (error) {
       next(error);
     }

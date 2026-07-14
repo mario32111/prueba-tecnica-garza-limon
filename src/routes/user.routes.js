@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const UserController = require('../controllers/user.controller');
 const validatorHandler = require('../middlewares/validator.handler');
-const { checkApiKey, checkRoles } = require('../middlewares/auth.handler');
+const { checkApiKey, checkRoles, checkJwtView } = require('../middlewares/auth.handler');
 const { createUserSchema, updateUserSchema, getUserSchema } = require('../schemas/user.schema');
 
 const apiRouter = express.Router();
@@ -48,7 +48,7 @@ apiRouter.delete('/:id',
   controller.delete.bind(controller),
 );
 
-// Vistas EJS (prefijo /users) - Público
-viewRouter.get('/list', controller.renderList.bind(controller));
+// Vistas EJS (prefijo /users) - Protegido admin
+viewRouter.get('/list', checkJwtView, checkRoles('admin'), controller.renderList.bind(controller));
 
 module.exports = { apiRouter, viewRouter };

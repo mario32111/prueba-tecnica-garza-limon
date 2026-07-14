@@ -7,11 +7,23 @@
       "skillPath": "database-schema-designer/SKILL.md",
       "computedHash": "0cc6c49513316e1584bcbda3ab4e72b6ff52d9ceb8bb06439c39ef936c4b4471"
     },
+    "impeccable": {
+      "source": "pbakaus/impeccable",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/impeccable/SKILL.md",
+      "computedHash": "e07098370ad7fd4605b67d305d8c06623a5c7d7737d2364e30932294ef880ff6"
+    },
     "sequelize": {
       "source": "mindrally/skills",
       "sourceType": "github",
       "skillPath": "sequelize/SKILL.md",
       "computedHash": "5ebc2439de2c788660ec8f48178b4828da03ab118900ec9f0c36addc1336a2a8"
+    },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "a55c93594689ff54fc12a1c40b8c5a418470e306392014667378f8633df105f0"
     }
   }
 }

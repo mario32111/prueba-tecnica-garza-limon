@@ -3,26 +3,134 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/stylesheets/style.css">
+  <title><%= title %> - VeloPark</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#eff6ff', 100:'#dbeafe', 200:'#bfdbfe', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 800:'#1e40af', 900:'#1e3a8a' },
+            success: { 50:'#f0fdf4', 100:'#dcfce7', 500:'#22c55e', 600:'#16a34a', 700:'#15803d' },
+            danger:  { 50:'#fef2f2', 100:'#fee2e2', 500:'#ef4444', 600:'#dc2626', 700:'#b91c1c' },
+            warning: { 50:'#fffbeb', 100:'#fef3c7', 500:'#f59e0b', 600:'#d97706' },
+            surface: { DEFAULT:'#ffffff', dark:'#1e293b' },
+            bg:      { DEFAULT:'#f0f9ff', dark:'#0f172a' },
+            fg:      { DEFAULT:'#0f172a', dark:'#f8fafc' },
+            muted:   { DEFAULT:'#f1f5f9', dark:'#334155' },
+            'muted-fg': { DEFAULT:'#64748b', dark:'#94a3b8' },
+            border:  { DEFAULT:'#e2e8f0', dark:'#334155' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if (localStorage.getItem('theme') === 'dark' ||
+       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </head>
-<body>
-  <h1><%= title %></h1>
-  <% if (error) { %>
-    <p style="color: red;"><%= error %></p>
-  <% } %>
-  <form action="/auth/login" method="POST">
-    <div>
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required>
+<body class="bg-gradient-to-br from-brand-50 via-white to-brand-100 dark:from-bg-dark dark:via-surface-dark dark:to-brand-900 min-h-screen flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center mb-4">
+        <svg viewBox="0 0 40 40" class="w-14 h-14">
+          <rect width="40" height="40" rx="10" fill="#2563EB"/>
+          <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+          <circle cx="14" cy="28" r="2" fill="white"/>
+          <circle cx="26" cy="28" r="2" fill="white"/>
+          <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+        </svg>
+      </div>
+      <h1 class="text-3xl font-bold text-fg dark:text-fg-dark">VeloPark</h1>
+      <p class="text-muted-fg dark:text-muted-fg-dark mt-2">Sistema de Gestión de Estacionamiento</p>
     </div>
-    <div>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
+
+    <div class="bg-surface dark:bg-surface-dark rounded-2xl shadow-xl border border-border dark:border-border-dark p-8">
+      <h2 class="text-xl font-semibold text-fg dark:text-fg-dark mb-6">Iniciar Sesión</h2>
+
+      <% if (error) { %>
+        <div class="mb-4 p-3 rounded-lg bg-danger-50 dark:bg-danger-900/30 border border-danger-100 dark:border-danger-700 flex items-start gap-2">
+          <svg class="w-5 h-5 text-danger-600 dark:text-danger-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm text-danger-700 dark:text-danger-400"><%= error %></p>
+        </div>
+      <% } %>
+
+      <form action="/auth/login" method="POST" class="space-y-5">
+        <div>
+          <label for="email" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-muted-fg dark:text-muted-fg-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <input type="email" id="email" name="email" required
+              class="w-full pl-10 pr-4 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors"
+              placeholder="tu@email.com">
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Contraseña</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-muted-fg dark:text-muted-fg-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <input type="password" id="password" name="password" required
+              class="w-full pl-10 pr-4 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors"
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <button type="submit"
+          class="w-full bg-brand-600 hover:bg-brand-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:focus:ring-offset-surface-dark cursor-pointer">
+          Iniciar Sesión
+        </button>
+      </form>
     </div>
-    <div>
-      <button type="submit">Iniciar Sesión</button>
+
+    <div class="mt-6 flex justify-center">
+      <button onclick="toggleTheme()" class="flex items-center gap-2 text-sm text-muted-fg dark:text-muted-fg-dark hover:text-fg dark:hover:text-fg-dark transition-colors cursor-pointer">
+        <svg id="sunIcon" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg id="moonIcon" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+        </svg>
+        <span id="themeLabel">Modo claro</span>
+      </button>
     </div>
-  </form>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      var html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+        document.getElementById('themeLabel').textContent = 'Modo claro';
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        document.getElementById('themeLabel').textContent = 'Modo oscuro';
+      }
+    }
+    if (document.documentElement.classList.contains('dark')) {
+      document.getElementById('themeLabel').textContent = 'Modo oscuro';
+    }
+  </script>
 </body>
 </html>

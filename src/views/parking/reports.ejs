@@ -3,134 +3,287 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; }
-    .navbar { background: #2c3e50; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
-    .navbar a { color: white; text-decoration: none; margin-left: 16px; }
-    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
-    .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    h2 { margin-bottom: 12px; color: #2c3e50; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
-    th { background: #3498db; color: white; }
-    tr:nth-child(even) { background: #f9f9f9; }
-    .form-group { margin-bottom: 10px; }
-    label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
-    input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-    button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
-    .btn-primary { background: #3498db; color: white; }
-    .btn-success { background: #27ae60; color: white; }
-    .filters-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .filters-row .form-group { flex: 1; min-width: 140px; }
-    .actions-row { display: flex; gap: 10px; margin-top: 16px; }
-  </style>
+  <title><%= title %> - VeloPark</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#eff6ff', 100:'#dbeafe', 200:'#bfdbfe', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 800:'#1e40af', 900:'#1e3a8a' },
+            success: { 50:'#f0fdf4', 100:'#dcfce7', 500:'#22c55e', 600:'#16a34a', 700:'#15803d' },
+            danger:  { 50:'#fef2f2', 100:'#fee2e2', 500:'#ef4444', 600:'#dc2626', 700:'#b91c1c' },
+            warning: { 50:'#fffbeb', 100:'#fef3c7', 500:'#f59e0b', 600:'#d97706' },
+            surface: { DEFAULT:'#ffffff', dark:'#1e293b' },
+            bg:      { DEFAULT:'#f0f9ff', dark:'#0f172a' },
+            fg:      { DEFAULT:'#0f172a', dark:'#f8fafc' },
+            muted:   { DEFAULT:'#f1f5f9', dark:'#334155' },
+            'muted-fg': { DEFAULT:'#64748b', dark:'#94a3b8' },
+            border:  { DEFAULT:'#e2e8f0', dark:'#334155' },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if (localStorage.getItem('theme') === 'dark' ||
+       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </head>
-<body>
-  <nav class="navbar">
-    <strong>SGE - Admin</strong>
-    <div>
-      <a href="/dashboard">Dashboard</a>
-      <a href="/parking/reports">Reportes</a>
-      <a href="/categories/list">Categorías</a>
-      <a href="/auth/logout">Salir</a>
+<body class="bg-bg dark:bg-bg-dark text-fg dark:text-fg-dark font-sans min-h-screen">
+
+  <!-- Navbar Desktop -->
+  <nav class="hidden lg:flex fixed top-0 left-0 right-0 z-40 h-16 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark items-center px-6 shadow-sm">
+    <div class="flex items-center gap-3 mr-8">
+      <svg viewBox="0 0 40 40" class="w-9 h-9">
+        <rect width="40" height="40" rx="10" fill="#2563EB"/>
+        <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+        <circle cx="14" cy="28" r="2" fill="white"/>
+        <circle cx="26" cy="28" r="2" fill="white"/>
+        <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+      </svg>
+      <span class="text-lg font-bold text-fg dark:text-fg-dark">VeloPark</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <a href="/dashboard" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Dashboard</a>
+      <a href="/parking/reports" class="px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">Reportes</a>
+      <a href="/categories/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Categorías</a>
+      <a href="/users/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Usuarios</a>
+    </div>
+    <div class="ml-auto flex items-center gap-3">
+      <button onclick="toggleTheme()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+      <span class="text-sm text-muted-fg dark:text-muted-fg-dark">Administrador</span>
+      <a href="/auth/logout" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Salir
+      </a>
     </div>
   </nav>
 
-  <div class="container">
-    <div class="section">
-      <h2>Filtros de Reporte</h2>
-      <div class="filters-row">
-        <div class="form-group">
-          <label>Desde:</label>
-          <input type="date" id="dateFrom">
-        </div>
-        <div class="form-group">
-          <label>Hasta:</label>
-          <input type="date" id="dateTo">
-        </div>
-        <div class="form-group">
-          <label>Placa:</label>
-          <input type="text" id="filterPlate" placeholder="Buscar...">
-        </div>
-        <div class="form-group">
-          <label>Categoría:</label>
-          <select id="filterCategory">
-            <option value="">Todas</option>
-            <% categories.forEach(function(c) { %>
-              <option value="<%= c.id %>"><%= c.name %></option>
-            <% }); %>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Min Costo ($):</label>
-          <input type="number" id="minCost" step="0.01" min="0">
-        </div>
-        <div class="form-group">
-          <label>Max Costo ($):</label>
-          <input type="number" id="maxCost" step="0.01" min="0">
-        </div>
-        <div class="form-group">
-          <label>Min Minutos:</label>
-          <input type="number" id="minMinutes" min="0">
-        </div>
-        <div class="form-group">
-          <label>Max Minutos:</label>
-          <input type="number" id="maxMinutes" min="0">
-        </div>
-        <div class="form-group">
-          <label>Ordenar por:</label>
-          <select id="sortBy">
-            <option value="">Entrada (desc)</option>
-            <option value="plate">Placa</option>
-            <option value="entry_time">Entrada</option>
-            <option value="exit_time">Salida</option>
-            <option value="total_cost">Costo</option>
-            <option value="total_minutes">Minutos</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Orden:</label>
-          <select id="sortOrder">
-            <option value="DESC">Descendente</option>
-            <option value="ASC">Ascendente</option>
-          </select>
-        </div>
-      </div>
-      <div class="actions-row">
-        <button onclick="applyFilters()" class="btn-primary">Aplicar Filtros</button>
-        <button onclick="exportExcel()" class="btn-success">Exportar Todo a Excel</button>
-        <button onclick="exportPdf()" class="btn-success" style="background:#e74c3c;">Exportar Todo a PDF</button>
-      </div>
+  <!-- Mobile Header -->
+  <header class="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark flex items-center px-4 shadow-sm">
+    <button onclick="toggleSidebar()" class="p-2 -ml-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="flex items-center gap-2 ml-3">
+      <svg viewBox="0 0 40 40" class="w-7 h-7">
+        <rect width="40" height="40" rx="10" fill="#2563EB"/>
+        <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+        <circle cx="14" cy="28" r="2" fill="white"/>
+        <circle cx="26" cy="28" r="2" fill="white"/>
+        <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+      </svg>
+      <span class="font-bold text-fg dark:text-fg-dark">VeloPark</span>
     </div>
+    <div class="ml-auto flex items-center gap-2">
+      <button onclick="toggleTheme()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+    </div>
+  </header>
 
-    <div class="section">
-      <h2>Resultados</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Placa</th>
-            <th>Categoría</th>
-            <th>Entrada</th>
-            <th>Salida</th>
-            <th>Minutos</th>
-            <th>Costo ($)</th>
-            <th>Estado</th>
-            <th>Registrado por</th>
-            <th>Exportar</th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-          <tr><td colspan="9">Aplica filtros para ver resultados.</td></tr>
-        </tbody>
-      </table>
+  <!-- Sidebar Overlay -->
+  <div id="sidebarOverlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar Mobile -->
+  <aside id="sidebar" class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-surface dark:bg-surface-dark border-r border-border dark:border-border-dark -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="flex items-center justify-between p-4 border-b border-border dark:border-border-dark">
+      <div class="flex items-center gap-2">
+        <svg viewBox="0 0 40 40" class="w-8 h-8">
+          <rect width="40" height="40" rx="10" fill="#2563EB"/>
+          <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+          <circle cx="14" cy="28" r="2" fill="white"/>
+          <circle cx="26" cy="28" r="2" fill="white"/>
+          <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+        </svg>
+        <span class="font-bold text-fg dark:text-fg-dark">VeloPark</span>
+      </div>
+      <button onclick="toggleSidebar()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
     </div>
-  </div>
+    <nav class="p-4 space-y-1">
+      <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a href="/parking/reports" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Reportes
+      </a>
+      <a href="/categories/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Categorías
+      </a>
+      <a href="/users/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        Usuarios
+      </a>
+      <div class="pt-4 mt-4 border-t border-border dark:border-border-dark">
+        <a href="/auth/logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Cerrar Sesión
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="pt-14 lg:pt-16 pb-8 px-4 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- Filtros -->
+      <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          Filtros de Reporte
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Desde</label>
+            <input type="date" id="dateFrom" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Hasta</label>
+            <input type="date" id="dateTo" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Placa</label>
+            <input type="text" id="filterPlate" placeholder="Buscar..." class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Categoría</label>
+            <select id="filterCategory" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors appearance-none">
+              <option value="">Todas</option>
+              <% categories.forEach(function(c) { %>
+                <option value="<%= c.id %>"><%= c.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Min Costo ($)</label>
+            <input type="number" id="minCost" step="0.01" min="0" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Max Costo ($)</label>
+            <input type="number" id="maxCost" step="0.01" min="0" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Min Minutos</label>
+            <input type="number" id="minMinutes" min="0" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Max Minutos</label>
+            <input type="number" id="maxMinutes" min="0" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Ordenar por</label>
+            <select id="sortBy" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors appearance-none">
+              <option value="">Entrada (desc)</option>
+              <option value="plate">Placa</option>
+              <option value="entry_time">Entrada</option>
+              <option value="exit_time">Salida</option>
+              <option value="total_cost">Costo</option>
+              <option value="total_minutes">Minutos</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Orden</label>
+            <select id="sortOrder" class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors appearance-none">
+              <option value="DESC">Descendente</option>
+              <option value="ASC">Ascendente</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3 mt-6">
+          <button onclick="applyFilters()" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+            Aplicar Filtros
+          </button>
+          <button onclick="exportExcel()" class="inline-flex items-center gap-2 bg-success-600 hover:bg-success-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Exportar Excel
+          </button>
+          <button onclick="exportPdf()" class="inline-flex items-center gap-2 bg-danger-600 hover:bg-danger-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            Exportar PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultados -->
+      <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
+        <div class="p-6 border-b border-border dark:border-border-dark">
+          <h2 class="text-lg font-semibold text-fg dark:text-fg-dark flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Resultados
+          </h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-muted dark:bg-muted-dark">
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Placa</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Categoría</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Entrada</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Salida</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Minutos</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Costo</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Estado</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Registrado por</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Exportar</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody" class="divide-y divide-border dark:divide-border-dark">
+              <tr>
+                <td colspan="9" class="px-4 py-12 text-center">
+                  <svg class="w-12 h-12 mx-auto text-muted-fg/30 dark:text-muted-fg-dark/30 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  <p class="text-muted-fg dark:text-muted-fg-dark text-sm">Aplica filtros para ver resultados</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
 
   <script>
     var AUTH_TOKEN = '<%- token %>';
     var API_KEY = 'test-api-key-2024';
+
+    function toggleSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      var overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('-translate-x-full');
+      if (sidebar.classList.contains('-translate-x-full')) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100', 'pointer-events-auto');
+      } else {
+        overlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100', 'pointer-events-auto');
+      }
+    }
+
+    function toggleTheme() {
+      var html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
 
     function buildQueryParams() {
       var params = new URLSearchParams();
@@ -158,20 +311,25 @@
         var tbody = document.getElementById('resultsBody');
         if (data.length > 0) {
           tbody.innerHTML = data.map(function(r) {
-            return '<tr>' +
-              '<td>' + r.plate + '</td>' +
-              '<td>' + (r.category ? r.category.name : '') + '</td>' +
-              '<td>' + new Date(r.entryTime).toLocaleString() + '</td>' +
-              '<td>' + (r.exitTime ? new Date(r.exitTime).toLocaleString() : 'Activo') + '</td>' +
-              '<td>' + (r.totalMinutes || 0) + '</td>' +
-              '<td>$' + parseFloat(r.totalCost || 0).toFixed(2) + '</td>' +
-              '<td>' + (r.status === 'active' ? 'Activo' : 'Completado') + '</td>' +
-              '<td>' + (r.registeredByUser ? r.registeredByUser.name : '') + '</td>' +
-              '<td><button onclick="exportPlate(\'' + r.plate + '\')" class="btn-success" style="font-size:11px;padding:4px 8px;">Excel</button> <button onclick="exportPlatePdf(\'' + r.plate + '\')" class="btn-success" style="font-size:11px;padding:4px 8px;background:#e74c3c;">PDF</button></td>' +
-              '</tr>';
+            var statusBadge = r.status === 'active'
+              ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-50 dark:bg-success-900/30 text-success-700 dark:text-success-400">Activo</span>'
+              : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted dark:bg-muted-dark text-muted-fg dark:text-muted-fg-dark">Completado</span>';
+            return '<tr class="hover:bg-muted/50 dark:hover:bg-muted-dark/50 transition-colors">' +
+              '<td class="px-4 py-3 text-sm font-mono font-medium text-fg dark:text-fg-dark">' + r.plate + '</td>' +
+              '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + (r.category ? r.category.name : '') + '</td>' +
+              '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + new Date(r.entryTime).toLocaleString() + '</td>' +
+              '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + (r.exitTime ? new Date(r.exitTime).toLocaleString() : 'Activo') + '</td>' +
+              '<td class="px-4 py-3 text-sm font-mono text-fg dark:text-fg-dark">' + (r.totalMinutes || 0) + '</td>' +
+              '<td class="px-4 py-3 text-sm font-mono text-fg dark:text-fg-dark">$' + parseFloat(r.totalCost || 0).toFixed(2) + '</td>' +
+              '<td class="px-4 py-3 text-sm">' + statusBadge + '</td>' +
+              '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + (r.registeredByUser ? r.registeredByUser.name : '') + '</td>' +
+              '<td class="px-4 py-3 text-sm"><div class="flex gap-1">' +
+                '<button onclick="exportPlate(\'' + r.plate + '\')" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-success-600 hover:bg-success-700 text-white transition-colors cursor-pointer"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Excel</button>' +
+                '<button onclick="exportPlatePdf(\'' + r.plate + '\')" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-danger-600 hover:bg-danger-700 text-white transition-colors cursor-pointer"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>PDF</button>' +
+              '</div></td></tr>';
           }).join('');
         } else {
-          tbody.innerHTML = '<tr><td colspan="9">Sin resultados.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-12 text-center"><p class="text-muted-fg dark:text-muted-fg-dark text-sm">Sin resultados</p></td></tr>';
         }
       });
     }

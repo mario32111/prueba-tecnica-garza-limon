@@ -3,125 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #f4f4f4; }
-    .navbar { background: #2c3e50; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
-    .navbar a { color: white; text-decoration: none; margin-left: 16px; }
-    .container { max-width: 800px; margin: 24px auto; padding: 0 16px; }
-    .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    h2 { margin-bottom: 12px; color: #2c3e50; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-    th { background: #3498db; color: white; }
-    tr:nth-child(even) { background: #f9f9f9; }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; margin-bottom: 4px; font-weight: bold; }
-    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-    button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-    .btn-primary { background: #3498db; color: white; }
-    .btn-success { background: #27ae60; color: white; margin-right: 8px; }
-    .btn-warning { background: #f39c12; color: white; margin-right: 8px; }
-    .btn-danger { background: #e74c3c; color: white; }
-    .row { display: flex; gap: 20px; }
-    .col { flex: 1; }
-    .success-msg { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
-    .error-msg { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
-  </style>
+  <title><%= title %> - VeloPark</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#eff6ff', 100:'#dbeafe', 200:'#bfdbfe', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 800:'#1e40af', 900:'#1e3a8a' },
+            success: { 50:'#f0fdf4', 100:'#dcfce7', 500:'#22c55e', 600:'#16a34a', 700:'#15803d' },
+            danger:  { 50:'#fef2f2', 100:'#fee2e2', 500:'#ef4444', 600:'#dc2626', 700:'#b91c1c' },
+            warning: { 50:'#fffbeb', 100:'#fef3c7', 500:'#f59e0b', 600:'#d97706' },
+            surface: { DEFAULT:'#ffffff', dark:'#1e293b' },
+            bg:      { DEFAULT:'#f0f9ff', dark:'#0f172a' },
+            fg:      { DEFAULT:'#0f172a', dark:'#f8fafc' },
+            muted:   { DEFAULT:'#f1f5f9', dark:'#334155' },
+            'muted-fg': { DEFAULT:'#64748b', dark:'#94a3b8' },
+            border:  { DEFAULT:'#e2e8f0', dark:'#334155' },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    if (localStorage.getItem('theme') === 'dark' ||
+       (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </head>
-<body>
-  <nav class="navbar">
-    <strong>SGE - Admin</strong>
-    <div>
-      <a href="/dashboard">Dashboard</a>
-      <a href="/parking/reports">Reportes</a>
-      <a href="/categories/list">Categorías</a>
-      <a href="/auth/logout">Salir</a>
+<body class="bg-bg dark:bg-bg-dark text-fg dark:text-fg-dark font-sans min-h-screen">
+
+  <!-- Navbar Desktop -->
+  <nav class="hidden lg:flex fixed top-0 left-0 right-0 z-40 h-16 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark items-center px-6 shadow-sm">
+    <div class="flex items-center gap-3 mr-8">
+      <svg viewBox="0 0 40 40" class="w-9 h-9">
+        <rect width="40" height="40" rx="10" fill="#2563EB"/>
+        <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+        <circle cx="14" cy="28" r="2" fill="white"/>
+        <circle cx="26" cy="28" r="2" fill="white"/>
+        <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+      </svg>
+      <span class="text-lg font-bold text-fg dark:text-fg-dark">VeloPark</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <a href="/dashboard" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Dashboard</a>
+      <a href="/parking/reports" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Reportes</a>
+      <a href="/categories/list" class="px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">Categorías</a>
+      <a href="/users/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Usuarios</a>
+    </div>
+    <div class="ml-auto flex items-center gap-3">
+      <button onclick="toggleTheme()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+      <span class="text-sm text-muted-fg dark:text-muted-fg-dark">Administrador</span>
+      <a href="/auth/logout" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Salir
+      </a>
     </div>
   </nav>
 
-  <div class="container">
-    <div id="messages"></div>
+  <!-- Mobile Header -->
+  <header class="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark flex items-center px-4 shadow-sm">
+    <button onclick="toggleSidebar()" class="p-2 -ml-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="flex items-center gap-2 ml-3">
+      <svg viewBox="0 0 40 40" class="w-7 h-7">
+        <rect width="40" height="40" rx="10" fill="#2563EB"/>
+        <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+        <circle cx="14" cy="28" r="2" fill="white"/>
+        <circle cx="26" cy="28" r="2" fill="white"/>
+        <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+      </svg>
+      <span class="font-bold text-fg dark:text-fg-dark">VeloPark</span>
+    </div>
+    <div class="ml-auto flex items-center gap-2">
+      <button onclick="toggleTheme()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+    </div>
+  </header>
 
-    <div class="row">
-      <div class="col">
-        <div class="section">
-          <h2>Nueva Categoría</h2>
-          <form id="createForm">
-            <div class="form-group">
-              <label>Nombre:</label>
-              <input type="text" id="catName" required>
+  <!-- Sidebar Overlay -->
+  <div id="sidebarOverlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar Mobile -->
+  <aside id="sidebar" class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-surface dark:bg-surface-dark border-r border-border dark:border-border-dark -translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="flex items-center justify-between p-4 border-b border-border dark:border-border-dark">
+      <div class="flex items-center gap-2">
+        <svg viewBox="0 0 40 40" class="w-8 h-8">
+          <rect width="40" height="40" rx="10" fill="#2563EB"/>
+          <path d="M12 28 L12 16 Q12 12 16 12 L24 12 Q28 12 28 16 L28 20 Q28 24 24 24 L16 24 L16 28 Z" fill="white" opacity="0.9"/>
+          <circle cx="14" cy="28" r="2" fill="white"/>
+          <circle cx="26" cy="28" r="2" fill="white"/>
+          <path d="M18 16 L22 16 Q24 16 24 18 L24 20 Q24 22 22 22 L18 22 Z" fill="#2563EB"/>
+        </svg>
+        <span class="font-bold text-fg dark:text-fg-dark">VeloPark</span>
+      </div>
+      <button onclick="toggleSidebar()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <nav class="p-4 space-y-1">
+      <a href="/dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Dashboard
+      </a>
+      <a href="/parking/reports" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Reportes
+      </a>
+      <a href="/categories/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        Categorías
+      </a>
+      <a href="/users/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        Usuarios
+      </a>
+      <div class="pt-4 mt-4 border-t border-border dark:border-border-dark">
+        <a href="/auth/logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Cerrar Sesión
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="pt-14 lg:pt-16 pb-8 px-4 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+
+      <!-- Toast container -->
+      <div id="messages" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+      <!-- Forms: Create + Edit -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Nueva Categoría -->
+        <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6">
+          <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Nueva Categoría
+          </h2>
+          <form id="createForm" class="space-y-4">
+            <div>
+              <label for="catName" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Nombre</label>
+              <input type="text" id="catName" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
             </div>
-            <div class="form-group">
-              <label>Descripción:</label>
-              <textarea id="catDescription" rows="2"></textarea>
+            <div>
+              <label for="catDescription" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Descripción</label>
+              <textarea id="catDescription" rows="2"
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors resize-none"></textarea>
             </div>
-            <div class="form-group">
-              <label>Precio por Minuto ($):</label>
-              <input type="number" id="catPrice" step="0.01" min="0" required>
+            <div>
+              <label for="catPrice" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Precio por Minuto ($)</label>
+              <input type="number" id="catPrice" step="0.01" min="0" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
             </div>
-            <button type="submit" class="btn-success">Crear Categoría</button>
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-success-600 hover:bg-success-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L7 21"/></svg>
+              Crear Categoría
+            </button>
           </form>
         </div>
-      </div>
-      <div class="col">
-        <div class="section" id="editSection" style="display:none;">
-          <h2>Editar Categoría</h2>
-          <form id="editForm">
+
+        <!-- Editar Categoría -->
+        <div id="editSection" class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6 hidden">
+          <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-warning-600 dark:text-warning-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Editar Categoría
+          </h2>
+          <form id="editForm" class="space-y-4">
             <input type="hidden" id="editId">
-            <div class="form-group">
-              <label>Nombre:</label>
-              <input type="text" id="editName" required>
+            <div>
+              <label for="editName" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Nombre</label>
+              <input type="text" id="editName" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
             </div>
-            <div class="form-group">
-              <label>Descripción:</label>
-              <textarea id="editDescription" rows="2"></textarea>
+            <div>
+              <label for="editDescription" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Descripción</label>
+              <textarea id="editDescription" rows="2"
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors resize-none"></textarea>
             </div>
-            <div class="form-group">
-              <label>Precio por Minuto ($):</label>
-              <input type="number" id="editPrice" step="0.01" min="0" required>
+            <div>
+              <label for="editPrice" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Precio por Minuto ($)</label>
+              <input type="number" id="editPrice" step="0.01" min="0" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
             </div>
-            <button type="submit" class="btn-warning">Actualizar</button>
-            <button type="button" onclick="cancelEdit()" class="btn-danger">Cancelar</button>
+            <div class="flex gap-3">
+              <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 bg-warning-600 hover:bg-warning-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Actualizar
+              </button>
+              <button type="button" onclick="cancelEdit()" class="inline-flex items-center justify-center gap-2 border border-border dark:border-border-dark text-fg dark:text-fg-dark hover:bg-muted dark:hover:bg-muted-dark py-2.5 px-4 rounded-lg font-medium transition-colors cursor-pointer">
+                Cancelar
+              </button>
+            </div>
           </form>
         </div>
       </div>
-    </div>
 
-    <div class="section">
-      <h2>Categorías Activas</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Precio/min</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="catTableBody">
-          <% categories.forEach(function(c) { %>
-            <tr>
-              <td><%= c.id %></td>
-              <td><%= c.name %></td>
-              <td><%= c.description || '' %></td>
-              <td>$<%= parseFloat(c.pricePerMinute).toFixed(2) %></td>
-              <td>
-                <button onclick='editCat(<%- JSON.stringify(c) %>)' class="btn-warning" style="font-size:12px;padding:4px 8px;">Editar</button>
-                <button onclick="deactivateCat(<%= c.id %>)" class="btn-danger" style="font-size:12px;padding:4px 8px;">Desactivar</button>
-              </td>
-            </tr>
-          <% }); %>
-        </tbody>
-      </table>
+      <!-- Categorías Activas -->
+      <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
+        <div class="p-6 border-b border-border dark:border-border-dark">
+          <h2 class="text-lg font-semibold text-fg dark:text-fg-dark flex items-center gap-2">
+            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            Categorías Activas
+          </h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-muted dark:bg-muted-dark">
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">ID</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Nombre</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Descripción</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Precio/min</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="catTableBody" class="divide-y divide-border dark:divide-border-dark">
+              <% categories.forEach(function(c) { %>
+                <tr class="hover:bg-muted/50 dark:hover:bg-muted-dark/50 transition-colors">
+                  <td class="px-4 py-3 text-sm font-mono text-muted-fg dark:text-muted-fg-dark"><%= c.id %></td>
+                  <td class="px-4 py-3 text-sm font-medium text-fg dark:text-fg-dark"><%= c.name %></td>
+                  <td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark"><%= c.description || '' %></td>
+                  <td class="px-4 py-3 text-sm font-mono font-medium text-fg dark:text-fg-dark">$<%= parseFloat(c.pricePerMinute).toFixed(2) %></td>
+                  <td class="px-4 py-3 text-sm">
+                    <div class="flex gap-2">
+                      <button onclick='editCat(<%- JSON.stringify(c) %>)' class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-border dark:border-border-dark text-fg dark:text-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                        Editar
+                      </button>
+                      <button onclick="deactivateCat(<%= c.id %>)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-danger-600 hover:bg-danger-700 text-white transition-colors cursor-pointer">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        Desactivar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
-  </div>
+  </main>
 
   <script>
     var AUTH_TOKEN = '<%- token %>';
     var API_KEY = 'test-api-key-2024';
+
+    function toggleSidebar() {
+      var sidebar = document.getElementById('sidebar');
+      var overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('-translate-x-full');
+      if (sidebar.classList.contains('-translate-x-full')) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        overlay.classList.remove('opacity-100', 'pointer-events-auto');
+      } else {
+        overlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        overlay.classList.add('opacity-100', 'pointer-events-auto');
+      }
+    }
+
+    function toggleTheme() {
+      var html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
 
     document.getElementById('createForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -163,15 +326,16 @@
     });
 
     function editCat(cat) {
-      document.getElementById('editSection').style.display = 'block';
+      document.getElementById('editSection').classList.remove('hidden');
       document.getElementById('editId').value = cat.id;
       document.getElementById('editName').value = cat.name;
       document.getElementById('editDescription').value = cat.description || '';
       document.getElementById('editPrice').value = cat.pricePerMinute;
+      document.getElementById('editSection').scrollIntoView({ behavior: 'smooth' });
     }
 
     function cancelEdit() {
-      document.getElementById('editSection').style.display = 'none';
+      document.getElementById('editSection').classList.add('hidden');
     }
 
     function deactivateCat(id) {
@@ -188,8 +352,16 @@
     }
 
     function showMsg(msg, type) {
-      document.getElementById('messages').innerHTML = '<div class="' + type + '-msg">' + msg + '</div>';
-      setTimeout(function() { document.getElementById('messages').innerHTML = ''; }, 4000);
+      var container = document.getElementById('messages');
+      var toast = document.createElement('div');
+      toast.className = 'flex items-center gap-2 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 ' +
+        (type === 'success' ? 'bg-success-600 text-white' : 'bg-danger-600 text-white');
+      toast.innerHTML = (type === 'success'
+        ? '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L7 21"/></svg>'
+        : '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>') +
+        '<span>' + msg + '</span>';
+      container.appendChild(toast);
+      setTimeout(function() { toast.remove(); }, 4000);
     }
   </script>
 </body>
