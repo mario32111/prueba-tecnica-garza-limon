@@ -1,3 +1,8 @@
 node_modules
 postgres_data
 .env
+.agents/
+.claude/
+skills-lock.json
+AGENTS.md
+/docs
