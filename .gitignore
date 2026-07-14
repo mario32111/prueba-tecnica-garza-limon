@@ -5,5 +5,6 @@ postgres_data
 .claude/
 skills-lock.json
 AGENTS.md
+PRODUCT.md
 /docs
 opencode.json
