@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const boom = require('@hapi/boom');
 const UserService = require('./user.service');
 const { config } = require('../config/config');
 
@@ -9,11 +10,11 @@ class AuthService {
   async getUser(email, password) {
     const user = await userService.findByEmail(email);
     if (!user) {
-      throw new Error('invalid credentials');
+      throw boom.unauthorized('Invalid email or password');
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new Error('invalid credentials');
+      throw boom.unauthorized('Invalid email or password');
     }
     delete user.dataValues.password;
     return user;

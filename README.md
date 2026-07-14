@@ -341,3 +341,12 @@ Indice unico parcial:
 | `parking_records.plate` | `vehicles.plate` | RESTRICT | RESTRICT |
 | `parking_records.category_id` | `categories.id` | RESTRICT | CASCADE |
 | `parking_records.registered_by` | `users.id` | RESTRICT | CASCADE |
+
+---
+
+## Recursos adicionales
+
+| Documento | Descripcion |
+|-----------|-------------|
+| [`apiEndpoints.md`](apiEndpoints.md) | Guia completa de todos los endpoints API: metodos, URLs, headers, body, ejemplos curl y respuestas esperadas |
+| [`esquemaBD.md`](esquemaBD.md) | Esquema completo de base de datos: reglas de negocio, definicion de tablas, indices, FKs, 3NF y consultas SQL |

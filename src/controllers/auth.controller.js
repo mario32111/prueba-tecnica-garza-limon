@@ -1,3 +1,4 @@
+const boom = require('@hapi/boom');
 const AuthService = require('../services/auth.service');
 const UserService = require('../services/user.service');
 
@@ -7,6 +8,9 @@ const userService = new UserService();
 class AuthController {
   async login(req, res, next) {
     try {
+      if (!req.user) {
+        throw boom.unauthorized('Invalid email or password');
+      }
       const { user, token } = await authService.signToken(req.user);
       res.json({ user, token });
     } catch (error) {
@@ -16,10 +20,14 @@ class AuthController {
 
   async loginView(req, res, next) {
     try {
+      if (!req.user) {
+        throw boom.unauthorized('Invalid email or password');
+      }
       const { user, token } = await authService.signToken(req.user);
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
+        path: '/',
       });
       res.redirect('/dashboard');
     } catch (error) {
@@ -42,7 +50,10 @@ class AuthController {
   }
 
   async logout(req, res) {
-    res.clearCookie('token');
+    res.clearCookie('token', {
+      httpOnly: true,
+      path: '/',
+    });
     res.redirect('/auth/login');
   }
 }
