@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "database-schema-designer": {
+      "source": "onewave-ai/claude-skills",
+      "sourceType": "github",
+      "skillPath": "database-schema-designer/SKILL.md",
+      "computedHash": "0cc6c49513316e1584bcbda3ab4e72b6ff52d9ceb8bb06439c39ef936c4b4471"
+    },
+    "sequelize": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "sequelize/SKILL.md",
+      "computedHash": "5ebc2439de2c788660ec8f48178b4828da03ab118900ec9f0c36addc1336a2a8"
+    }
+  }
+}
