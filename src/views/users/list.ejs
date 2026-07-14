@@ -28,6 +28,9 @@
     }
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; border-radius: 4px; }
+  </style>
   <script>
     if (localStorage.getItem('theme') === 'dark' ||
        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -56,13 +59,13 @@
       <a href="/users/list" class="px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">Usuarios</a>
     </div>
     <div class="ml-auto flex items-center gap-3">
-      <button onclick="toggleTheme()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
-        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <button onclick="toggleTheme()" aria-label="Cambiar tema" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5 hidden dark:block" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="w-5 h-5 block dark:hidden" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
       </button>
       <span class="text-sm text-muted-fg dark:text-muted-fg-dark">Administrador</span>
       <a href="/auth/logout" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <svg class="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
         Salir
       </a>
     </div>
@@ -70,8 +73,8 @@
 
   <!-- Mobile Header -->
   <header class="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-surface dark:bg-surface-dark border-b border-border dark:border-border-dark flex items-center px-4 shadow-sm">
-    <button onclick="toggleSidebar()" class="p-2 -ml-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    <button onclick="toggleSidebar()" aria-label="Abrir menú" class="p-2 -ml-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+      <svg class="w-6 h-6" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <div class="flex items-center gap-2 ml-3">
       <svg viewBox="0 0 40 40" class="w-7 h-7">
@@ -84,9 +87,9 @@
       <span class="font-bold text-fg dark:text-fg-dark">VeloPark</span>
     </div>
     <div class="ml-auto flex items-center gap-2">
-      <button onclick="toggleTheme()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
-        <svg class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <svg class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <button onclick="toggleTheme()" aria-label="Cambiar tema" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5 hidden dark:block" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg class="w-5 h-5 block dark:hidden" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
       </button>
     </div>
   </header>
@@ -107,8 +110,8 @@
         </svg>
         <span class="font-bold text-fg dark:text-fg-dark">VeloPark</span>
       </div>
-      <button onclick="toggleSidebar()" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      <button onclick="toggleSidebar()" aria-label="Cerrar menú" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+        <svg class="w-5 h-5" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
     <nav class="p-4 space-y-1">

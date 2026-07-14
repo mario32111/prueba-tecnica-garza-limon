@@ -303,3 +303,47 @@ docker-compose exec postgres psql -U garza_user -d garza_limon_db
 # Logs API
 docker-compose logs api --tail=50
 ```
+
+---
+
+## 8. Design Context — VeloPark
+
+Brand identity and design guidelines for the UI layer. Full spec at `PRODUCT.md`.
+
+### Identity
+- **Brand:** VeloPark — Sistema de Gestión de Estacionamientos
+- **Register:** Product (dashboard/admin tool)
+- **Positioning:** Simplicidad radical — opera sin capacitación
+- **Personality:** Rápido · Confiable · Profesional
+
+### Design System
+- **Framework:** Tailwind CSS (Play CDN), EJS views, Inter font
+- **Palette:** brand `#2563EB` (azul), success `#16a34a` (verde), danger `#DC2626` (rojo), warning `#d97706` (ámbar)
+- **Surface:** `#ffffff` light / `#1e293b` dark
+- **Background:** `#f0f9ff` light / `#0f172a` dark
+- **Font:** Inter (sans-serif, weights 300-700 via Google Fonts)
+- **Dark mode:** `class` strategy, `localStorage` persistence + `prefers-color-scheme` fallback
+- **Responsive:** navbar ≥ 1024px, sidebar < 1024px, tables `overflow-x-auto`
+
+### Component Tokens
+| Component | Classes |
+|-----------|---------|
+| Card | `bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6` |
+| Btn Primary | `bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors` |
+| Btn Success | `bg-success-600 hover:bg-success-700 text-white px-4 py-2.5 rounded-lg font-medium` |
+| Btn Danger | `bg-danger-600 hover:bg-danger-700 text-white px-4 py-2.5 rounded-lg font-medium` |
+| Input | `w-full px-3 py-2.5 border border-border rounded-lg bg-surface focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none` |
+| Badge | `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium` |
+
+### Accessibility
+- All icon buttons have `aria-label`
+- All SVG icons have `aria-hidden="true"`
+- Toast containers have `role="alert" aria-live="polite"`
+- Focus-visible ring on all interactive elements
+
+### Principles
+1. Zero-friction operations — cada acción frecuente a un click
+2. Trust through clarity — cada cobro visible y verificable
+3. Professional without ceremony — seria pero no intimidante
+4. Speed is the feature — entrada y cobro < 3 segundos
+

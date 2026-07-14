@@ -7,6 +7,12 @@
       "skillPath": "database-schema-designer/SKILL.md",
       "computedHash": "0cc6c49513316e1584bcbda3ab4e72b6ff52d9ceb8bb06439c39ef936c4b4471"
     },
+    "emil-design-eng": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/emil-design-eng/SKILL.md",
+      "computedHash": "8bdf9e4e6de7a4969147bf4828a4ad2c5aacd9fba4b690b250a85e0467ca387d"
+    },
     "impeccable": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
