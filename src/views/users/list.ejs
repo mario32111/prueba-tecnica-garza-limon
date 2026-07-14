@@ -29,7 +29,31 @@
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    }
     :focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; border-radius: 4px; }
+
+    button, [role="button"] {
+      transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), background-color 160ms var(--ease-out);
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    button:active { transform: scale(0.97); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .row-stagger { opacity: 0; animation: fadeUp 300ms var(--ease-out) forwards; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
   <script>
     if (localStorage.getItem('theme') === 'dark' ||
@@ -95,10 +119,10 @@
   </header>
 
   <!-- Sidebar Overlay -->
-  <div id="sidebarOverlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar()"></div>
+  <div id="sidebarOverlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden opacity-0 pointer-events-none" style="transition: opacity 250ms var(--ease-out), backdrop-filter 250ms var(--ease-out);" onclick="toggleSidebar()"></div>
 
   <!-- Sidebar Mobile -->
-  <aside id="sidebar" class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-surface dark:bg-surface-dark border-r border-border dark:border-border-dark -translate-x-full transition-transform duration-300 ease-in-out">
+  <aside id="sidebar" class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-surface dark:bg-surface-dark border-r border-border dark:border-border-dark -translate-x-full" style="transition: transform 300ms var(--ease-out);">
     <div class="flex items-center justify-between p-4 border-b border-border dark:border-border-dark">
       <div class="flex items-center gap-2">
         <svg viewBox="0 0 40 40" class="w-8 h-8">
@@ -211,6 +235,15 @@
   </main>
 
   <script>
+    (function() {
+      var rows = document.querySelectorAll('table tbody tr');
+      rows.forEach(function(row, i) {
+        row.style.opacity = '0';
+        row.style.animation = 'fadeUp 300ms var(--ease-out) forwards';
+        row.style.animationDelay = (i * 60) + 'ms';
+      });
+    })();
+
     function toggleSidebar() {
       var sidebar = document.getElementById('sidebar');
       var overlay = document.getElementById('sidebarOverlay');

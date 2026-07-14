@@ -29,7 +29,44 @@
   </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+      --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    }
     :focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; border-radius: 4px; }
+
+    button, [role="button"] {
+      transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out), background-color 160ms var(--ease-out);
+    }
+    button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    button:active { transform: scale(0.97); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .dark .skeleton {
+      background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+      background-size: 200% 100%;
+    }
+    .result-row { animation: fadeUp 250ms var(--ease-out) forwards; opacity: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
   <script>
     if (localStorage.getItem('theme') === 'dark' ||
@@ -95,10 +132,10 @@
   </header>
 
   <!-- Sidebar Overlay -->
-  <div id="sidebarOverlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar()"></div>
+  <div id="sidebarOverlay" class="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm hidden opacity-0 pointer-events-none" style="transition: opacity 250ms var(--ease-out), backdrop-filter 250ms var(--ease-out);" onclick="toggleSidebar()"></div>
 
   <!-- Sidebar Mobile -->
-  <aside id="sidebar" class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-surface dark:bg-surface-dark border-r border-border dark:border-border-dark -translate-x-full transition-transform duration-300 ease-in-out">
+  <aside id="sidebar" class="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-surface dark:bg-surface-dark border-r border-border dark:border-border-dark -translate-x-full" style="transition: transform 300ms var(--ease-out);">
     <div class="flex items-center justify-between p-4 border-b border-border dark:border-border-dark">
       <div class="flex items-center gap-2">
         <svg viewBox="0 0 40 40" class="w-8 h-8">
@@ -306,6 +343,12 @@
 
     function applyFilters() {
       var qs = buildQueryParams();
+      var tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-6"><div class="space-y-3">' +
+        '<div class="skeleton rounded h-5 w-full"></div>' +
+        '<div class="skeleton rounded h-5 w-3/4"></div>' +
+        '<div class="skeleton rounded h-5 w-1/2"></div>' +
+      '</div></td></tr>';
       fetch('/api/v1/parking?' + qs, {
         headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
       })
@@ -313,11 +356,11 @@
       .then(function(data) {
         var tbody = document.getElementById('resultsBody');
         if (data.length > 0) {
-          tbody.innerHTML = data.map(function(r) {
+          tbody.innerHTML = data.map(function(r, idx) {
             var statusBadge = r.status === 'active'
               ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-50 dark:bg-success-900/30 text-success-700 dark:text-success-400">Activo</span>'
               : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted dark:bg-muted-dark text-muted-fg dark:text-muted-fg-dark">Completado</span>';
-            return '<tr class="hover:bg-muted/50 dark:hover:bg-muted-dark/50 transition-colors">' +
+            return '<tr class="result-row hover:bg-muted/50 dark:hover:bg-muted-dark/50 transition-colors" style="animation-delay:' + (idx * 60) + 'ms">' +
               '<td class="px-4 py-3 text-sm font-mono font-medium text-fg dark:text-fg-dark">' + r.plate + '</td>' +
               '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + (r.category ? r.category.name : '') + '</td>' +
               '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + new Date(r.entryTime).toLocaleString() + '</td>' +
