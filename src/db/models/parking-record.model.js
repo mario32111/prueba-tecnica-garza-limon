@@ -84,6 +84,11 @@ class ParkingRecord extends Model {
       foreignKey: 'category_id',
       as: 'category',
     });
+    this.belongsTo(models.Vehicle, {
+      foreignKey: 'plate',
+      targetKey: 'plate',
+      as: 'vehicle',
+    });
   }
 
   static config(sequelize) {

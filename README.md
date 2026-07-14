@@ -52,7 +52,7 @@ El contenido de `.env` debe ser:
 NODE_ENV=development
 PORT=3000
 
-DB_HOST=localhost
+DB_HOST=postgres
 DB_PORT=5432
 DB_NAME=garza_limon_db
 DB_USER=garza_user
@@ -119,7 +119,8 @@ Se ejecutan en este orden. Cada una crea una tabla con sus indices y constraints
 |---|---------|-------|----------|
 | 1 | `20250101000001-create-users.js` | `users` | Tabla de usuarios con columnas `id`, `email` (unique), `password_hash`, `name`, `role` (con CHECK `admin`/`employee`), `is_active`, timestamps. Indice unique sobre `email`. |
 | 2 | `20250101000002-create-categories.js` | `categories` | Tabla de categorias tarifarias con `id`, `name` (unique), `description`, `price_per_minute` (decimal), `is_active`, timestamps. Indice unique sobre `name`. |
-| 3 | `20250101000003-create-parking-records.js` | `parking_records` | Tabla de registros de estacionamiento con `plate`, `entry_time`, `exit_time`, `total_minutes`, `total_cost`, `category_id` (FK -> categories), `registered_by` (FK -> users), `status` (CHECK `active`/`completed`). Partial unique index sobre `plate WHERE status = 'active'` (no permite dos vehiculos activos con la misma placa). Indices sobre `entry_time`, `category_id`, `status`. |
+| 3 | `20250101000003-create-vehicles.js` | `vehicles` | Tabla de vehiculos registrados con `id`, `plate` (unique FK desde parking_records), `category_id` (FK -> categories), `is_active`, timestamps. Indices unique sobre `plate` y btree sobre `category_id`. |
+| 4 | `20250101000004-create-parking-records.js` | `parking_records` | Tabla de registros de estacionamiento con `plate` (FK -> vehicles.plate), `entry_time`, `exit_time`, `total_minutes`, `total_cost`, `category_id` (FK -> categories), `registered_by` (FK -> users), `status` (CHECK `active`/`completed`). Partial unique index sobre `plate WHERE status = 'active'`. Indices sobre `entry_time`, `category_id`, `status`. |
 
 ### Revertir migraciones
 
@@ -154,6 +155,16 @@ docker-compose exec api npx sequelize-cli db:migrate:undo:all
 
 - 4 registros completados (con entrada, salida y costo calculado)
 - 1 registro activo (vehiculo actualmente estacionado: `JKL012`)
+
+### Vehiculos registrados (5)
+
+| Placa | Categoria |
+|-------|-----------|
+| ABC123 | Residente |
+| DEF456 | No Residente |
+| GHI789 | Oficial |
+| JKL012 | No Residente |
+| MNO345 | Residente |
 
 Los registros usan tiempos relativos al momento en que se ejecuta el seeder, por lo que las fechas y tiempos seran coherentes.
 
@@ -279,6 +290,7 @@ src/
     auth/          # Login
     parking/       # Dashboard + Reportes
     categories/    # CRUD Categorias
+    vehicles/      # CRUD Vehiculos
     users/         # Lista de Usuarios
 ```
 
@@ -287,36 +299,35 @@ src/
 ## Diagrama de Base de Datos
 
 ```
-+------------------+          +---------------------+
-|     users        |          |    categories       |
-+------------------+          +---------------------+
-| id (PK)          |          | id (PK)             |
-| email (UNIQUE)   |          | name (UNIQUE)       |
-| password_hash    |          | description         |
-| name             |          | price_per_minute    |
-| role             |          | is_active           |
-| is_active        |          | created_at          |
-| created_at       |          | updated_at          |
-| updated_at       |          +----------+----------+
-+--------+---------+                     |
-         |                               | 1:N
-         | 1:N                           |
-         |                               |
-+--------v--------------------------------v----------+
-|                  parking_records                     |
-+------------------------------------------------------+
-| id (PK)                                              |
-| plate (NOT NULL)                                     |
-| entry_time (NOT NULL, DEFAULT NOW())                  |
-| exit_time (NULL hasta salida)                        |
-| total_minutes (NULL, calculado al salir)              |
-| total_cost (NULL, calculado al salir)                 |
-| category_id (FK -> categories.id, NOT NULL)           |
-| registered_by (FK -> users.id, NOT NULL)              |
-| status (CHECK: 'active' | 'completed')               |
-| created_at                                            |
-| updated_at                                            |
-+------------------------------------------------------+
++------------------+     +---------------------+     +------------------+
+|     users        |     |    categories       |     |    vehicles      |
++------------------+     +---------------------+     +------------------+
+| id (PK)          |     | id (PK)             |     | id (PK)          |
+| email (UNIQUE)   |     | name (UNIQUE)       |     | plate (UNIQUE)   |
+| password_hash    |     | description         |     | category_id (FK)-+
+| name             |     | price_per_minute    |     | is_active        |
+| role             |     | is_active           |     | created_at       |
+| is_active        |     | created_at          |     | updated_at       |
+| created_at       |     | updated_at          |     +--------+---------+
+| updated_at       |     +----------+----------+              |
++--------+---------+                |                         |
+         |                          | 1:N                     | 1:N
+         | 1:N                      |                         |
+         |                          |                         |
++--------v--------------------------v-------------------------v----------+
+|                        parking_records                                 |
++------------------------------------------------------------------------+
+| id (PK)                                                                |
+| plate (FK -> vehicles.plate, NOT NULL)                                 |
+| category_id (FK -> categories.id, NOT NULL)                            |
+| registered_by (FK -> users.id, NOT NULL)                               |
+| entry_time (NOT NULL, DEFAULT NOW())                                   |
+| exit_time (NULL)                                                       |
+| total_minutes (NULL, calculado al salir)                               |
+| total_cost (NULL, calculado al salir)                                  |
+| status (CHECK: 'active' | 'completed')                                |
+| created_at, updated_at                                                  |
++------------------------------------------------------------------------+
 
 Indice unico parcial:
   idx_parking_active_plate UNIQUE (plate) WHERE status = 'active'
@@ -326,7 +337,7 @@ Indice unico parcial:
 
 | FK (origen) | Referencia (destino) | ON DELETE | ON UPDATE |
 |-------------|---------------------|-----------|-----------|
+| `vehicles.category_id` | `categories.id` | RESTRICT | CASCADE |
+| `parking_records.plate` | `vehicles.plate` | RESTRICT | RESTRICT |
 | `parking_records.category_id` | `categories.id` | RESTRICT | CASCADE |
 | `parking_records.registered_by` | `users.id` | RESTRICT | CASCADE |
-
-**Documento completo:** [`docs/esquemaBD.md`](docs/esquemaBD.md) — reglas de negocio, definicion detallada de columnas, indices, 3NF, consultas SQL de ejemplo.

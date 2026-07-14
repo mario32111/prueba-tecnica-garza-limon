@@ -53,17 +53,6 @@
       to   { opacity: 0; transform: translateX(30px); }
     }
 
-    #editSection {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 350ms var(--ease-out), opacity 250ms var(--ease-out);
-    }
-    #editSection.edit-open {
-      max-height: 600px;
-      opacity: 1;
-    }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -74,6 +63,17 @@
     }
     .row-enter { animation: fadeUp 300ms var(--ease-out) forwards; opacity: 0; }
     .row-exit { animation: rowOut 250ms var(--ease-in) forwards; overflow: hidden; }
+
+    #editSection {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 350ms var(--ease-out), opacity 250ms var(--ease-out);
+    }
+    #editSection.edit-open {
+      max-height: 400px;
+      opacity: 1;
+    }
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -105,17 +105,19 @@
     </div>
     <div class="flex items-center gap-1">
       <a href="/dashboard" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Dashboard</a>
-      <a href="/parking/reports" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Reportes</a>
-      <a href="/categories/list" class="px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">Categorías</a>
-      <a href="/users/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Usuarios</a>
-      <a href="/vehicles/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Vehículos</a>
+      <% if (user.role === 'admin') { %>
+        <a href="/parking/reports" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Reportes</a>
+        <a href="/categories/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Categorías</a>
+        <a href="/users/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Usuarios</a>
+      <% } %>
+      <a href="/vehicles/list" class="px-3 py-2 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">Vehículos</a>
     </div>
     <div class="ml-auto flex items-center gap-3">
       <button onclick="toggleTheme()" aria-label="Cambiar tema" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
         <svg class="w-5 h-5 hidden dark:block" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         <svg class="w-5 h-5 block dark:hidden" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
       </button>
-      <span class="text-sm text-muted-fg dark:text-muted-fg-dark">Administrador</span>
+      <span class="text-sm text-muted-fg dark:text-muted-fg-dark"><%= user.role === 'admin' ? 'Administrador' : 'Empleado' %></span>
       <a href="/auth/logout" class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
         <svg class="w-4 h-4" aria-hidden="true" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
         Salir
@@ -171,19 +173,21 @@
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         Dashboard
       </a>
-      <a href="/parking/reports" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Reportes
-      </a>
-      <a href="/categories/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-        Categorías
-      </a>
-      <a href="/users/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        Usuarios
-      </a>
-      <a href="/vehicles/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+      <% if (user.role === 'admin') { %>
+        <a href="/parking/reports" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          Reportes
+        </a>
+        <a href="/categories/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          Categorías
+        </a>
+        <a href="/users/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Usuarios
+        </a>
+      <% } %>
+      <a href="/vehicles/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
         Vehículos
       </a>
@@ -200,62 +204,59 @@
   <main class="pt-20 lg:pt-24 pb-8 px-4 lg:px-8">
     <div class="max-w-6xl mx-auto">
 
-      <!-- Toast container -->
       <div id="messages" class="fixed top-20 right-4 z-50 space-y-2" role="alert" aria-live="polite"></div>
 
       <!-- Forms: Create + Edit -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Nueva Categoría -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Nuevo Vehículo (solo admin) -->
+        <% if (user.role === 'admin') { %>
         <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6">
           <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Nueva Categoría
+            Nuevo Vehículo
           </h2>
           <form id="createForm" class="space-y-4">
             <div>
-              <label for="catName" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Nombre</label>
-              <input type="text" id="catName" required
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+              <label for="vPlate" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Placa</label>
+              <input type="text" id="vPlate" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors uppercase">
             </div>
             <div>
-              <label for="catDescription" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Descripción</label>
-              <textarea id="catDescription" rows="2"
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors resize-none"></textarea>
-            </div>
-            <div>
-              <label for="catPrice" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Precio por Minuto ($)</label>
-              <input type="number" id="catPrice" step="0.01" min="0" required
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+              <label for="vCategory" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Categoría</label>
+              <select id="vCategory" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors appearance-none">
+                <option value="">Seleccionar...</option>
+                <% vehicles.forEach(function(v) { %>
+                  <option value="<%= v.category && v.category.id %>"><%= v.category ? v.category.name : '' %></option>
+                <% }); %>
+              </select>
             </div>
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 bg-success-600 hover:bg-success-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L7 21"/></svg>
-              Crear Categoría
+              Crear Vehículo
             </button>
           </form>
         </div>
 
-        <!-- Editar Categoría -->
+        <!-- Editar Vehículo -->
         <div id="editSection" class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6 hidden">
           <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
             <svg class="w-5 h-5 text-warning-600 dark:text-warning-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            Editar Categoría
+            Editar Vehículo
           </h2>
           <form id="editForm" class="space-y-4">
             <input type="hidden" id="editId">
             <div>
-              <label for="editName" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Nombre</label>
-              <input type="text" id="editName" required
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+              <label for="editPlate" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Placa</label>
+              <input type="text" id="editPlate" disabled
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-muted dark:bg-muted-dark text-muted-fg dark:text-muted-fg-dark">
             </div>
             <div>
-              <label for="editDescription" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Descripción</label>
-              <textarea id="editDescription" rows="2"
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors resize-none"></textarea>
-            </div>
-            <div>
-              <label for="editPrice" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Precio por Minuto ($)</label>
-              <input type="number" id="editPrice" step="0.01" min="0" required
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors">
+              <label for="editCategory" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Categoría</label>
+              <select id="editCategory" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors appearance-none">
+                <option value="">Seleccionar...</option>
+              </select>
             </div>
             <div class="flex gap-3">
               <button type="submit" class="flex-1 inline-flex items-center justify-center gap-2 bg-warning-600 hover:bg-warning-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
@@ -268,14 +269,15 @@
             </div>
           </form>
         </div>
+        <% } %>
       </div>
 
-      <!-- Categorías Activas -->
+      <!-- Vehículos -->
       <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm">
         <div class="p-6 border-b border-border dark:border-border-dark">
           <h2 class="text-lg font-semibold text-fg dark:text-fg-dark flex items-center gap-2">
-            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-            Categorías Activas
+            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            Vehículos Registrados
           </h2>
         </div>
         <div class="overflow-x-auto">
@@ -283,31 +285,54 @@
             <thead>
               <tr class="bg-muted dark:bg-muted-dark">
                 <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">ID</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Nombre</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Descripción</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Precio/min</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Acciones</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Placa</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Categoría</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Estado</th>
+                <% if (user.role === 'admin') { %>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-muted-fg dark:text-muted-fg-dark uppercase tracking-wider">Acciones</th>
+                <% } %>
               </tr>
             </thead>
-            <tbody id="catTableBody" class="divide-y divide-border dark:divide-border-dark">
-              <% categories.forEach(function(c) { %>
+            <tbody id="vTableBody" class="divide-y divide-border dark:divide-border-dark">
+              <% vehicles.forEach(function(v) { %>
                 <tr class="hover:bg-muted/50 dark:hover:bg-muted-dark/50 transition-colors">
-                  <td class="px-4 py-3 text-sm font-mono text-muted-fg dark:text-muted-fg-dark"><%= c.id %></td>
-                  <td class="px-4 py-3 text-sm font-medium text-fg dark:text-fg-dark"><%= c.name %></td>
-                  <td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark"><%= c.description || '' %></td>
-                  <td class="px-4 py-3 text-sm font-mono font-medium text-fg dark:text-fg-dark">$<%= parseFloat(c.pricePerMinute).toFixed(2) %></td>
+                  <td class="px-4 py-3 text-sm font-mono text-muted-fg dark:text-muted-fg-dark"><%= v.id %></td>
+                  <td class="px-4 py-3 text-sm font-mono font-medium text-fg dark:text-fg-dark"><%= v.plate %></td>
                   <td class="px-4 py-3 text-sm">
-                    <div class="flex gap-2">
-                      <button onclick='editCat(<%- JSON.stringify(c) %>)' class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-border dark:border-border-dark text-fg dark:text-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        Editar
-                      </button>
-                      <button onclick="deactivateCat(<%= c.id %>)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-danger-600 hover:bg-danger-700 text-white transition-colors cursor-pointer">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
-                        Desactivar
-                      </button>
-                    </div>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                      <%= v.category && v.category.name === 'Oficial' ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400' :
+                         v.category && v.category.name === 'Residente' ? 'bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400' :
+                         'bg-danger-50 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400' %>">
+                      <%= v.category ? v.category.name : '' %>
+                    </span>
                   </td>
+                  <td class="px-4 py-3 text-sm">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                      <%= v.isActive ? 'bg-success-50 dark:bg-success-900/30 text-success-700 dark:text-success-400' : 'bg-danger-50 dark:bg-danger-900/30 text-danger-700 dark:text-danger-400' %>">
+                      <%= v.isActive ? 'Activo' : 'Inactivo' %>
+                    </span>
+                  </td>
+                  <% if (user.role === 'admin') { %>
+                    <td class="px-4 py-3 text-sm">
+                      <div class="flex gap-2">
+                        <button onclick='editVehicle(<%- JSON.stringify(v) %>)' class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-border dark:border-border-dark text-fg dark:text-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                          Editar
+                        </button>
+                        <% if (v.isActive) { %>
+                          <button onclick="deactivateVehicle(<%= v.id %>)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-danger-600 hover:bg-danger-700 text-white transition-colors cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            Desactivar
+                          </button>
+                        <% } else { %>
+                          <button onclick="reactivateVehicle(<%= v.id %>)" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-success-600 hover:bg-success-700 text-white transition-colors cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L7 21"/></svg>
+                            Reactivar
+                          </button>
+                        <% } %>
+                      </div>
+                    </td>
+                  <% } %>
                 </tr>
               <% }); %>
             </tbody>
@@ -322,7 +347,7 @@
     var API_KEY = 'test-api-key-2024';
 
     (function() {
-      var rows = document.querySelectorAll('#catTableBody tr');
+      var rows = document.querySelectorAll('#vTableBody tr');
       rows.forEach(function(row, i) {
         row.style.animationDelay = (i * 60) + 'ms';
         row.classList.add('row-enter');
@@ -353,14 +378,14 @@
       }
     }
 
+    <% if (user.role === 'admin') { %>
     document.getElementById('createForm').addEventListener('submit', function(e) {
       e.preventDefault();
       var data = {
-        name: document.getElementById('catName').value.trim(),
-        description: document.getElementById('catDescription').value.trim(),
-        pricePerMinute: parseFloat(document.getElementById('catPrice').value),
+        plate: document.getElementById('vPlate').value.trim(),
+        categoryId: parseInt(document.getElementById('vCategory').value),
       };
-      fetch('/api/v1/categories', {
+      fetch('/api/v1/vehicles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
         body: JSON.stringify(data),
@@ -368,24 +393,7 @@
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
-        else {
-          showMsg('Categoría creada: ' + d.name, 'success');
-          document.getElementById('catName').value = '';
-          document.getElementById('catDescription').value = '';
-          document.getElementById('catPrice').value = '';
-          var tbody = document.getElementById('catTableBody');
-          var row = document.createElement('tr');
-          row.className = 'row-enter hover:bg-muted/50 dark:hover:bg-muted-dark/50 transition-colors';
-          row.innerHTML = '<td class="px-4 py-3 text-sm font-mono text-muted-fg dark:text-muted-fg-dark">' + d.id + '</td>' +
-            '<td class="px-4 py-3 text-sm font-medium text-fg dark:text-fg-dark">' + d.name + '</td>' +
-            '<td class="px-4 py-3 text-sm text-muted-fg dark:text-muted-fg-dark">' + (d.description || '') + '</td>' +
-            '<td class="px-4 py-3 text-sm font-mono font-medium text-fg dark:text-fg-dark">$' + parseFloat(d.pricePerMinute).toFixed(2) + '</td>' +
-            '<td class="px-4 py-3 text-sm"><div class="flex gap-2">' +
-              '<button onclick=\'editCat(' + JSON.stringify(d).replace(/'/g, "&#39;") + ')\' class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-border dark:border-border-dark text-fg dark:text-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Editar</button>' +
-              '<button onclick="deactivateCat(' + d.id + ')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-danger-600 hover:bg-danger-700 text-white transition-colors cursor-pointer"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Desactivar</button>' +
-            '</div></td>';
-          tbody.insertBefore(row, tbody.firstChild);
-        }
+        else { showMsg('Vehículo creado: ' + d.plate, 'success'); setTimeout(function() { location.reload(); }, 1000); }
       });
     });
 
@@ -393,11 +401,9 @@
       e.preventDefault();
       var id = document.getElementById('editId').value;
       var data = {
-        name: document.getElementById('editName').value.trim(),
-        description: document.getElementById('editDescription').value.trim(),
-        pricePerMinute: parseFloat(document.getElementById('editPrice').value),
+        categoryId: parseInt(document.getElementById('editCategory').value),
       };
-      fetch('/api/v1/categories/' + id, {
+      fetch('/api/v1/vehicles/' + id, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
         body: JSON.stringify(data),
@@ -405,29 +411,26 @@
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
-        else {
-          showMsg('Categoría actualizada', 'success');
-          cancelEdit();
-          var rows = document.querySelectorAll('#catTableBody tr');
-          rows.forEach(function(row) {
-            var cells = row.querySelectorAll('td');
-            if (cells.length > 0 && cells[0].textContent.trim() === String(d.id)) {
-              cells[1].textContent = d.name;
-              cells[2].textContent = d.description || '';
-              cells[3].textContent = '$' + parseFloat(d.pricePerMinute).toFixed(2);
-            }
-          });
-        }
+        else { showMsg('Vehículo actualizado', 'success'); setTimeout(function() { location.reload(); }, 1000); }
       });
     });
 
-    function editCat(cat) {
+    function editVehicle(v) {
       document.getElementById('editSection').classList.remove('hidden');
       document.getElementById('editSection').classList.add('edit-open');
-      document.getElementById('editId').value = cat.id;
-      document.getElementById('editName').value = cat.name;
-      document.getElementById('editDescription').value = cat.description || '';
-      document.getElementById('editPrice').value = cat.pricePerMinute;
+      document.getElementById('editId').value = v.id;
+      document.getElementById('editPlate').value = v.plate;
+      var sel = document.getElementById('editCategory');
+      sel.innerHTML = '';
+      document.querySelectorAll('#vCategory option').forEach(function(opt) {
+        if (opt.value) {
+          var o = document.createElement('option');
+          o.value = opt.value;
+          o.textContent = opt.textContent;
+          if (parseInt(opt.value) === v.categoryId) o.selected = true;
+          sel.appendChild(o);
+        }
+      });
       document.getElementById('editSection').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -436,9 +439,9 @@
       setTimeout(function() { document.getElementById('editSection').classList.add('hidden'); }, 350);
     }
 
-    function deactivateCat(id) {
-      if (!confirm('¿Desactivar esta categoría?')) return;
-      fetch('/api/v1/categories/' + id, {
+    function deactivateVehicle(id) {
+      if (!confirm('¿Desactivar este vehículo?')) return;
+      fetch('/api/v1/vehicles/' + id, {
         method: 'DELETE',
         headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
       })
@@ -446,8 +449,8 @@
       .then(function(d) {
         if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
         else {
-          showMsg('Categoría desactivada', 'success');
-          var rows = document.querySelectorAll('#catTableBody tr');
+          showMsg('Vehículo desactivado', 'success');
+          var rows = document.querySelectorAll('#vTableBody tr');
           rows.forEach(function(row) {
             var cells = row.querySelectorAll('td');
             if (cells.length > 0 && cells[0].textContent.trim() === String(id)) {
@@ -458,6 +461,19 @@
         }
       });
     }
+
+    function reactivateVehicle(id) {
+      fetch('/api/v1/vehicles/' + id + '/reactivate', {
+        method: 'PATCH',
+        headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
+        else { showMsg('Vehículo reactivado', 'success'); setTimeout(function() { location.reload(); }, 1000); }
+      });
+    }
+    <% } %>
 
     function showMsg(msg, type) {
       var container = document.getElementById('messages');

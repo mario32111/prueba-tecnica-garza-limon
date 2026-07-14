@@ -150,6 +150,7 @@
         <a href="/categories/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Categorías</a>
         <a href="/users/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Usuarios</a>
       <% } %>
+      <a href="/vehicles/list" class="px-3 py-2 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">Vehículos</a>
     </div>
     <div class="ml-auto flex items-center gap-3">
       <button onclick="toggleTheme()" aria-label="Cambiar tema" class="p-2 rounded-lg text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark transition-colors cursor-pointer">
@@ -226,6 +227,10 @@
           Usuarios
         </a>
       <% } %>
+      <a href="/vehicles/list" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-fg dark:text-muted-fg-dark hover:bg-muted dark:hover:bg-muted-dark hover:text-fg dark:hover:text-fg-dark transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+        Vehículos
+      </a>
       <div class="pt-4 mt-4 border-t border-border dark:border-border-dark">
         <a href="/auth/logout" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-danger-600 dark:text-danger-500 hover:bg-danger-50 dark:hover:bg-danger-900/20 transition-colors">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -243,17 +248,23 @@
       <div id="messages" class="fixed top-20 right-4 z-50 space-y-2" role="alert" aria-live="polite"></div>
 
       <!-- Registrar Entrada + Buscar -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div class="lg:col-span-2 bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6">
-          <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            Registrar Entrada
-          </h2>
-          <form id="entryForm" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-            <div>
+      <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Registrar Entrada
+        </h2>
+        <form id="entryForm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div class="sm:col-span-2 lg:col-span-1">
               <label for="entryPlate" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Placa</label>
-              <input type="text" id="entryPlate" placeholder="ABC123" required
-                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors uppercase">
+              <input type="text" id="entryPlate" placeholder="ABC123" list="vehicleList" required
+                class="w-full px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors uppercase"
+                oninput="onPlateInput()">
+              <datalist id="vehicleList">
+                <% vehicles.forEach(function(v) { %>
+                  <option value="<%= v.plate %>" data-category="<%= v.categoryId %>"><%= v.category ? v.category.name : '' %></option>
+                <% }); %>
+              </datalist>
             </div>
             <div>
               <label for="entryCategory" class="block text-sm font-medium text-fg dark:text-fg-dark mb-1.5">Categoría</label>
@@ -269,22 +280,12 @@
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L7 21"/></svg>
               Registrar
             </button>
-          </form>
-        </div>
-
-        <div class="bg-surface dark:bg-surface-dark rounded-xl border border-border dark:border-border-dark shadow-sm p-6">
-          <h2 class="text-lg font-semibold text-fg dark:text-fg-dark mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-brand-600 dark:text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            Buscar Vehículo
-          </h2>
-          <div class="flex gap-2">
-            <input type="text" id="searchPlate" placeholder="Placa..."
-              class="flex-1 px-3 py-2.5 border border-border dark:border-border-dark rounded-lg bg-surface dark:bg-surface-dark text-fg dark:text-fg-dark placeholder-muted-fg dark:placeholder-muted-fg-dark focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-colors uppercase">
-            <button onclick="searchVehicle()" aria-label="Buscar vehículo" class="bg-brand-600 hover:bg-brand-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm cursor-pointer">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <button type="button" onclick="searchVehicle()" class="bg-brand-600 hover:bg-brand-700 text-white py-2.5 px-4 rounded-lg font-medium transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              Buscar
             </button>
           </div>
-        </div>
+        </form>
       </div>
 
       <!-- Vehículos Estacionados -->
@@ -413,6 +414,17 @@
 
     var currentPlate = '';
 
+    function onPlateInput() {
+      var plate = document.getElementById('entryPlate').value.trim().toUpperCase();
+      document.getElementById('entryPlate').value = plate;
+      var options = document.querySelectorAll('#vehicleList option');
+      options.forEach(function(opt) {
+        if (opt.value === plate) {
+          document.getElementById('entryCategory').value = opt.dataset.category;
+        }
+      });
+    }
+
     function cobrar(plate) {
       currentPlate = plate;
       document.getElementById('cobrarPlate').textContent = plate;
@@ -459,7 +471,7 @@
     }
 
     function searchVehicle() {
-      var plate = document.getElementById('searchPlate').value.trim();
+      var plate = document.getElementById('entryPlate').value.trim();
       if (!plate) return;
       fetch('/api/v1/parking/plate/' + plate, {
         headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },

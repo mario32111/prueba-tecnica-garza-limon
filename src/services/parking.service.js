@@ -18,6 +18,15 @@ class ParkingService {
       throw boom.notFound('Category not found or inactive');
     }
 
+    const vehicle = await models.Vehicle.findOne({ where: { plate } });
+    if (vehicle) {
+      if (!vehicle.isActive) {
+        throw boom.conflict('This vehicle is deactivated in the system. Activate it before registering.');
+      }
+    } else {
+      await models.Vehicle.create({ plate, categoryId });
+    }
+
     const record = await models.ParkingRecord.create({
       plate,
       categoryId,
@@ -25,10 +34,20 @@ class ParkingService {
       status: 'active',
     });
 
-    return record;
+    return await models.ParkingRecord.findByPk(record.id, {
+      include: [
+        { model: models.Category, as: 'category' },
+        { model: models.User, as: 'registeredByUser', attributes: ['id', 'name'] },
+      ],
+    });
   }
 
   async registerExit(plate) {
+    const vehicle = await models.Vehicle.findOne({ where: { plate } });
+    if (vehicle && !vehicle.isActive) {
+      throw boom.conflict('This vehicle is deactivated in the system. Activate it before processing exit.');
+    }
+
     const record = await models.ParkingRecord.findOne({
       where: { plate, status: 'active' },
       include: [{ model: models.Category, as: 'category' }],
@@ -130,6 +149,7 @@ class ParkingService {
       include: [
         { model: models.Category, as: 'category' },
         { model: models.User, as: 'registeredByUser', attributes: ['id', 'name'] },
+        { model: models.Vehicle, as: 'vehicle', include: [{ model: models.Category, as: 'category' }] },
       ],
       order,
     });

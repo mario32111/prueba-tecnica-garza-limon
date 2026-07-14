@@ -1,8 +1,10 @@
 const ParkingService = require('../services/parking.service');
 const CategoryService = require('../services/category.service');
+const VehicleService = require('../services/vehicle.service');
 
 const parkingService = new ParkingService();
 const categoryService = new CategoryService();
+const vehicleService = new VehicleService();
 
 class ParkingController {
   async createEntry(req, res, next) {
@@ -106,9 +108,11 @@ class ParkingController {
     try {
       const records = await parkingService.findActive();
       const categories = await categoryService.find();
+      const vehicles = await vehicleService.find(true);
       res.render('parking/dashboard', {
         records,
         categories,
+        vehicles,
         user: req.user,
         token: req.cookies.token,
         title: 'Panel de Estacionamiento',
@@ -121,8 +125,10 @@ class ParkingController {
   async renderReports(req, res, next) {
     try {
       const categories = await categoryService.find();
+      const vehicles = await vehicleService.find(true);
       res.render('parking/reports', {
         categories,
+        vehicles,
         user: req.user,
         token: req.cookies.token,
         title: 'Reportes',

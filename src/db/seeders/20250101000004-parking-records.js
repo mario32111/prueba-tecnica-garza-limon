@@ -6,14 +6,13 @@ const { PARKING_RECORD_TABLE } = require('../models/parking-record.model');
 module.exports = {
   async up(queryInterface) {
     const now = new Date();
-
     const minutesAgo = (min) => new Date(now.getTime() - min * 60000);
 
     await queryInterface.bulkInsert(PARKING_RECORD_TABLE, [
       {
         plate: 'ABC123',
-        category_id: 2, // Residente
-        registered_by: 2, // employee
+        category_id: 2,
+        registered_by: 2,
         status: 'completed',
         entry_time: minutesAgo(120),
         exit_time: minutesAgo(30),
@@ -24,8 +23,8 @@ module.exports = {
       },
       {
         plate: 'DEF456',
-        category_id: 3, // No Residente
-        registered_by: 1, // admin
+        category_id: 3,
+        registered_by: 1,
         status: 'completed',
         entry_time: minutesAgo(180),
         exit_time: minutesAgo(60),
@@ -36,8 +35,8 @@ module.exports = {
       },
       {
         plate: 'GHI789',
-        category_id: 1, // Oficial
-        registered_by: 2, // employee
+        category_id: 1,
+        registered_by: 2,
         status: 'completed',
         entry_time: minutesAgo(240),
         exit_time: minutesAgo(120),
@@ -48,8 +47,8 @@ module.exports = {
       },
       {
         plate: 'JKL012',
-        category_id: 3, // No Residente
-        registered_by: 1, // admin
+        category_id: 3,
+        registered_by: 1,
         status: 'active',
         entry_time: minutesAgo(15),
         exit_time: null,
@@ -60,8 +59,8 @@ module.exports = {
       },
       {
         plate: 'MNO345',
-        category_id: 2, // Residente
-        registered_by: 2, // employee
+        category_id: 2,
+        registered_by: 2,
         status: 'completed',
         entry_time: minutesAgo(300),
         exit_time: minutesAgo(15),

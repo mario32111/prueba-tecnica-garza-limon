@@ -19,6 +19,9 @@ function routerApi(app) {
   const { apiRouter: parkingApiRouter } = require('./parking.routes');
   router.use('/parking', parkingApiRouter);
 
+  const { apiRouter: vehicleApiRouter } = require('./vehicle.routes');
+  router.use('/vehicles', vehicleApiRouter);
+
   app.use('/api/v1', router);
 
   const { viewRouter: userViewRouter } = require('./user.routes');
@@ -32,6 +35,9 @@ function routerApi(app) {
 
   const { viewRouter: parkingViewRouter } = require('./parking.routes');
   app.use('/parking', parkingViewRouter);
+
+  const { viewRouter: vehicleViewRouter } = require('./vehicle.routes');
+  app.use('/vehicles', vehicleViewRouter);
 
   app.get('/dashboard', (req, res) => {
     const token = req.cookies.token;

@@ -15,6 +15,12 @@ module.exports = {
       plate: {
         type: Sequelize.STRING(20),
         allowNull: false,
+        references: {
+          model: 'vehicles',
+          key: 'plate',
+        },
+        onDelete: 'RESTRICT',
+        onUpdate: 'RESTRICT',
       },
       entry_time: {
         type: Sequelize.DATE,
@@ -83,25 +89,19 @@ module.exports = {
     await queryInterface.addIndex(PARKING_RECORD_TABLE, ['entry_time'], {
       name: 'idx_parking_entry_time',
     });
-
     await queryInterface.addIndex(PARKING_RECORD_TABLE, ['category_id'], {
       name: 'idx_parking_category',
     });
-
     await queryInterface.addIndex(PARKING_RECORD_TABLE, ['status'], {
       name: 'idx_parking_status',
     });
   },
 
   async down(queryInterface) {
-    await queryInterface.sequelize.query(
-      `DROP INDEX IF EXISTS idx_parking_active_plate`
-    );
-
+    await queryInterface.sequelize.query(`DROP INDEX IF EXISTS idx_parking_active_plate`);
     await queryInterface.removeIndex(PARKING_RECORD_TABLE, 'idx_parking_status');
     await queryInterface.removeIndex(PARKING_RECORD_TABLE, 'idx_parking_category');
     await queryInterface.removeIndex(PARKING_RECORD_TABLE, 'idx_parking_entry_time');
-
     await queryInterface.dropTable(PARKING_RECORD_TABLE);
   },
 };
