@@ -78,6 +78,30 @@ class ParkingController {
     }
   }
 
+  async exportPdf(req, res, next) {
+    try {
+      const filters = req.query;
+      const buffer = await parkingService.exportToPdf(filters);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=reporte_estacionamiento.pdf');
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async exportPlatePdf(req, res, next) {
+    try {
+      const { plate } = req.params;
+      const buffer = await parkingService.exportToPdf({ plate, status: undefined }, plate);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=reporte_${plate}.pdf`);
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async renderDashboard(req, res, next) {
     try {
       const records = await parkingService.findActive();

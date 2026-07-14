@@ -101,6 +101,7 @@
       <div class="actions-row">
         <button onclick="applyFilters()" class="btn-primary">Aplicar Filtros</button>
         <button onclick="exportExcel()" class="btn-success">Exportar Todo a Excel</button>
+        <button onclick="exportPdf()" class="btn-success" style="background:#e74c3c;">Exportar Todo a PDF</button>
       </div>
     </div>
 
@@ -166,7 +167,7 @@
               '<td>$' + parseFloat(r.totalCost || 0).toFixed(2) + '</td>' +
               '<td>' + (r.status === 'active' ? 'Activo' : 'Completado') + '</td>' +
               '<td>' + (r.registeredByUser ? r.registeredByUser.name : '') + '</td>' +
-              '<td><button onclick="exportPlate(\'' + r.plate + '\')" class="btn-success" style="font-size:11px;padding:4px 8px;">Excel</button></td>' +
+              '<td><button onclick="exportPlate(\'' + r.plate + '\')" class="btn-success" style="font-size:11px;padding:4px 8px;">Excel</button> <button onclick="exportPlatePdf(\'' + r.plate + '\')" class="btn-success" style="font-size:11px;padding:4px 8px;background:#e74c3c;">PDF</button></td>' +
               '</tr>';
           }).join('');
         } else {
@@ -183,6 +184,16 @@
 
     function exportPlate(plate) {
       window.open('/api/v1/parking/export/' + plate + '?api=' + API_KEY + '&token=' + AUTH_TOKEN, '_blank');
+    }
+
+    function exportPdf() {
+      var qs = buildQueryParams();
+      var sep = qs ? '&' : '';
+      window.open('/api/v1/parking/export-pdf?' + qs + sep + 'api=' + API_KEY + '&token=' + AUTH_TOKEN, '_blank');
+    }
+
+    function exportPlatePdf(plate) {
+      window.open('/api/v1/parking/export-pdf/' + plate + '?api=' + API_KEY + '&token=' + AUTH_TOKEN, '_blank');
     }
   </script>
 </body>

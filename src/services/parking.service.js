@@ -2,6 +2,7 @@ const boom = require('@hapi/boom');
 const { models } = require('../libs/sequelize');
 const { Op } = require('sequelize');
 const XLSX = require('xlsx');
+const PDFDocument = require('pdfkit');
 
 class ParkingService {
   async registerEntry(plate, categoryId, userId) {
@@ -157,6 +158,94 @@ class ParkingService {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte');
 
     return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  }
+
+  async exportToPdf(filters = {}, plate = null) {
+    const records = await this.findAll(filters);
+
+    return new Promise((resolve, reject) => {
+      const doc = new PDFDocument({ margin: 50 });
+      const chunks = [];
+
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', reject);
+
+      doc.fontSize(18).font('Helvetica-Bold').text('Reporte de Estacionamiento', { align: 'center' });
+      doc.moveDown(0.5);
+      doc.fontSize(10).font('Helvetica').text(`Generado: ${new Date().toLocaleString()}`, { align: 'center' });
+
+      if (plate) {
+        doc.moveDown(0.3);
+        doc.fontSize(12).font('Helvetica-Bold').text(`Vehículo: ${plate}`, { align: 'center' });
+      }
+
+      doc.moveDown(1);
+
+      const columns = ['Placa', 'Categoría', 'Entrada', 'Salida', 'Min', 'Costo', 'Estado', 'Registrado'];
+      const colWidths = [70, 80, 100, 100, 40, 50, 60, 90];
+      const startX = 50;
+      const startY = doc.y;
+      const rowHeight = 20;
+      const headerY = doc.y;
+
+      doc.font('Helvetica-Bold').fontSize(9);
+      let x = startX;
+      columns.forEach((col, i) => {
+        doc.text(col, x, headerY, { width: colWidths[i], align: 'center' });
+        x += colWidths[i];
+      });
+
+      doc.moveTo(startX, headerY + rowHeight).lineTo(startX + colWidths.reduce((a, b) => a + b, 0), headerY + rowHeight).stroke();
+      doc.moveTo(startX, headerY).lineTo(startX, headerY + rowHeight).stroke();
+      x = startX;
+      colWidths.forEach((w) => {
+        x += w;
+        doc.moveTo(x, headerY).lineTo(x, headerY + rowHeight).stroke();
+      });
+
+      doc.font('Helvetica').fontSize(8);
+      let y = headerY + rowHeight;
+
+      records.forEach((r, idx) => {
+        if (y > 720) {
+          doc.addPage();
+          y = 50;
+        }
+
+        const rowData = [
+          r.plate,
+          r.category ? r.category.name : '',
+          new Date(r.entryTime).toLocaleString(),
+          r.exitTime ? new Date(r.exitTime).toLocaleString() : 'Activo',
+          String(r.totalMinutes || 0),
+          `$${parseFloat(r.totalCost || 0).toFixed(2)}`,
+          r.status === 'active' ? 'Activo' : 'Completado',
+          r.registeredByUser ? r.registeredByUser.name : '',
+        ];
+
+        if (idx % 2 === 1) {
+          doc.rect(startX, y, colWidths.reduce((a, b) => a + b, 0), rowHeight).fill('#f5f5f5');
+        }
+
+        x = startX;
+        rowData.forEach((cell, i) => {
+          doc.text(cell, x, y + 2, { width: colWidths[i], align: 'center' });
+          x += colWidths[i];
+        });
+
+        doc.moveTo(startX, y + rowHeight).lineTo(startX + colWidths.reduce((a, b) => a + b, 0), y + rowHeight).stroke();
+        x = startX;
+        colWidths.forEach((w) => {
+          x += w;
+          doc.moveTo(x, y).lineTo(x, y + rowHeight).stroke();
+        });
+
+        y += rowHeight;
+      });
+
+      doc.end();
+    });
   }
 }
 

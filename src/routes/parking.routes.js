@@ -60,6 +60,22 @@ apiRouter.get('/export/:plate',
   controller.exportPlateExcel.bind(controller),
 );
 
+apiRouter.get('/export-pdf',
+  checkApiKey,
+  extractTokenFromQuery,
+  passport.authenticate('jwt', { session: false }),
+  checkRoles('admin'),
+  controller.exportPdf.bind(controller),
+);
+
+apiRouter.get('/export-pdf/:plate',
+  checkApiKey,
+  extractTokenFromQuery,
+  passport.authenticate('jwt', { session: false }),
+  checkRoles('admin'),
+  controller.exportPlatePdf.bind(controller),
+);
+
 viewRouter.get('/dashboard', checkJwtView, controller.renderDashboard.bind(controller));
 
 viewRouter.get('/reports', checkJwtView, checkRoles('admin'), controller.renderReports.bind(controller));
