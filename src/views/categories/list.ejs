@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    .navbar { background: #2c3e50; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .navbar a { color: white; text-decoration: none; margin-left: 16px; }
+    .container { max-width: 800px; margin: 24px auto; padding: 0 16px; }
+    .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    h2 { margin-bottom: 12px; color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #3498db; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; }
+    input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-success { background: #27ae60; color: white; margin-right: 8px; }
+    .btn-warning { background: #f39c12; color: white; margin-right: 8px; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .row { display: flex; gap: 20px; }
+    .col { flex: 1; }
+    .success-msg { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+    .error-msg { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <strong>SGE - Admin</strong>
+    <div>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/parking/reports">Reportes</a>
+      <a href="/categories/list">Categorías</a>
+      <a href="/auth/logout">Salir</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div id="messages"></div>
+
+    <div class="row">
+      <div class="col">
+        <div class="section">
+          <h2>Nueva Categoría</h2>
+          <form id="createForm">
+            <div class="form-group">
+              <label>Nombre:</label>
+              <input type="text" id="catName" required>
+            </div>
+            <div class="form-group">
+              <label>Descripción:</label>
+              <textarea id="catDescription" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Precio por Minuto ($):</label>
+              <input type="number" id="catPrice" step="0.01" min="0" required>
+            </div>
+            <button type="submit" class="btn-success">Crear Categoría</button>
+          </form>
+        </div>
+      </div>
+      <div class="col">
+        <div class="section" id="editSection" style="display:none;">
+          <h2>Editar Categoría</h2>
+          <form id="editForm">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+              <label>Nombre:</label>
+              <input type="text" id="editName" required>
+            </div>
+            <div class="form-group">
+              <label>Descripción:</label>
+              <textarea id="editDescription" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Precio por Minuto ($):</label>
+              <input type="number" id="editPrice" step="0.01" min="0" required>
+            </div>
+            <button type="submit" class="btn-warning">Actualizar</button>
+            <button type="button" onclick="cancelEdit()" class="btn-danger">Cancelar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Categorías Activas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio/min</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="catTableBody">
+          <% categories.forEach(function(c) { %>
+            <tr>
+              <td><%= c.id %></td>
+              <td><%= c.name %></td>
+              <td><%= c.description || '' %></td>
+              <td>$<%= parseFloat(c.pricePerMinute).toFixed(2) %></td>
+              <td>
+                <button onclick='editCat(<%- JSON.stringify(c) %>)' class="btn-warning" style="font-size:12px;padding:4px 8px;">Editar</button>
+                <button onclick="deactivateCat(<%= c.id %>)" class="btn-danger" style="font-size:12px;padding:4px 8px;">Desactivar</button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    var AUTH_TOKEN = '<%- token %>';
+    var API_KEY = 'test-api-key-2024';
+
+    document.getElementById('createForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var data = {
+        name: document.getElementById('catName').value.trim(),
+        description: document.getElementById('catDescription').value.trim(),
+        pricePerMinute: parseFloat(document.getElementById('catPrice').value),
+      };
+      fetch('/api/v1/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+        body: JSON.stringify(data),
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
+        else { showMsg('Categoría creada: ' + d.name, 'success'); setTimeout(function() { location.reload(); }, 1000); }
+      });
+    });
+
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var id = document.getElementById('editId').value;
+      var data = {
+        name: document.getElementById('editName').value.trim(),
+        description: document.getElementById('editDescription').value.trim(),
+        pricePerMinute: parseFloat(document.getElementById('editPrice').value),
+      };
+      fetch('/api/v1/categories/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+        body: JSON.stringify(data),
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
+        else { showMsg('Categoría actualizada', 'success'); setTimeout(function() { location.reload(); }, 1000); }
+      });
+    });
+
+    function editCat(cat) {
+      document.getElementById('editSection').style.display = 'block';
+      document.getElementById('editId').value = cat.id;
+      document.getElementById('editName').value = cat.name;
+      document.getElementById('editDescription').value = cat.description || '';
+      document.getElementById('editPrice').value = cat.pricePerMinute;
+    }
+
+    function cancelEdit() {
+      document.getElementById('editSection').style.display = 'none';
+    }
+
+    function deactivateCat(id) {
+      if (!confirm('¿Desactivar esta categoría?')) return;
+      fetch('/api/v1/categories/' + id, {
+        method: 'DELETE',
+        headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.statusCode) { showMsg(d.message || 'Error', 'error'); }
+        else { showMsg('Categoría desactivada', 'success'); setTimeout(function() { location.reload(); }, 1000); }
+      });
+    }
+
+    function showMsg(msg, type) {
+      document.getElementById('messages').innerHTML = '<div class="' + type + '-msg">' + msg + '</div>';
+      setTimeout(function() { document.getElementById('messages').innerHTML = ''; }, 4000);
+    }
+  </script>
+</body>
+</html>

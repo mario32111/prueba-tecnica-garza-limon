@@ -148,8 +148,25 @@ Ver `docs/esquemaBD.md` para la especificación completa (reglas de negocio, 3NF
 | `POST` | `/api/v1/users` | apiKey + JWT + admin | Crear usuario |
 | `PATCH` | `/api/v1/users/:id` | apiKey + JWT + admin | Actualizar usuario |
 | `DELETE` | `/api/v1/users/:id` | apiKey + JWT + admin | Eliminar usuario |
+| `GET` | `/api/v1/categories` | apiKey + JWT | Listar categorías |
+| `GET` | `/api/v1/categories/:id` | apiKey + JWT | Ver categoría |
+| `POST` | `/api/v1/categories` | apiKey + JWT + admin | Crear categoría |
+| `PATCH` | `/api/v1/categories/:id` | apiKey + JWT + admin | Actualizar categoría |
+| `DELETE` | `/api/v1/categories/:id` | apiKey + JWT + admin | Soft-delete categoría |
+| `GET` | `/api/v1/parking` | apiKey + JWT | Listar registros (+ filtros) |
+| `GET` | `/api/v1/parking/active` | apiKey + JWT | Listar vehículos activos |
+| `GET` | `/api/v1/parking/plate/:plate` | apiKey + JWT | Buscar por placa |
+| `POST` | `/api/v1/parking/entry` | apiKey + JWT + employee/admin | Registrar entrada |
+| `POST` | `/api/v1/parking/exit` | apiKey + JWT + employee/admin | Registrar salida (cobro) |
+| `GET` | `/api/v1/parking/export` | apiKey + JWT + admin | Exportar reporte Excel |
+| `GET` | `/api/v1/parking/export/:plate` | apiKey + JWT + admin | Exportar reporte por placa |
 | `GET` | `/users/list` | Público | Vista EJS usuarios |
 | `GET` | `/auth/login` | Público | Vista EJS login |
+| `POST` | `/auth/login` | Validación Joi | Login vista (cookie + redirect) |
+| `GET` | `/auth/logout` | — | Logout vista (limpia cookie) |
+| `GET` | `/dashboard` | Cookie JWT | Dashboard (empleado/admin) |
+| `GET` | `/parking/reports` | Cookie JWT + admin | Vista reportes |
+| `GET` | `/categories/list` | Cookie JWT + admin | Vista categorías |
 
 ### Headers de seguridad
 
@@ -162,12 +179,12 @@ Authorization: Bearer <token_jwt>
 
 | Módulo | Endpoints | Rol |
 |--------|-----------|-----|
-| **Categories** | CRUD (`/api/v1/categories`) | Admin (crear/editar/soft-delete), Empleado (listar) |
-| **Parking Entry** | `POST /api/v1/parking/entry` | Empleado, Admin |
-| **Parking Exit/Cobro** | `POST /api/v1/parking/exit` | Empleado, Admin |
-| **Parking List** | `GET /api/v1/parking` (+ filtros) | Empleado, Admin |
-| **Reportes** | `GET /api/v1/reports` (filtros: fecha, categoría, ingreso) | Admin |
-| **Export Excel** | `GET /api/v1/reports/export` | Admin |
+| ~~**Categories**~~ | ~~CRUD (`/api/v1/categories`)~~ | Implementado |
+| ~~**Parking Entry**~~ | ~~`POST /api/v1/parking/entry`~~ | Implementado |
+| ~~**Parking Exit/Cobro**~~ | ~~`POST /api/v1/parking/exit`~~ | Implementado |
+| ~~**Parking List**~~ | ~~`GET /api/v1/parking` (+ filtros)~~ | Implementado |
+| ~~**Reportes**~~ | ~~`GET /parking/reports` (filtros: fecha, categoría, ingreso)~~ | Implementado |
+| ~~**Export Excel**~~ | ~~`GET /api/v1/parking/export` + `/export/:plate`~~ | Implementado |
 
 ---
 

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    .navbar { background: #2c3e50; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .navbar a { color: white; text-decoration: none; margin-left: 16px; }
+    .container { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    h2 { margin-bottom: 12px; color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #3498db; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-success { background: #27ae60; color: white; }
+    .btn-danger { background: #e74c3c; color: white; }
+    .btn-warning { background: #f39c12; color: white; }
+    .row { display: flex; gap: 20px; }
+    .col { flex: 1; }
+    .success-msg { background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+    .error-msg { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 12px; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 24px; border-radius: 8px; max-width: 400px; text-align: center; }
+    .modal-content button { margin: 8px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <strong>SGE - <%= user.role === 'admin' ? 'Admin' : 'Empleado' %></strong>
+    <div>
+      <a href="/dashboard">Dashboard</a>
+      <% if (user.role === 'admin') { %>
+        <a href="/parking/reports">Reportes</a>
+        <a href="/categories/list">Categorías</a>
+      <% } %>
+      <a href="/auth/logout">Salir</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="section">
+          <h2>Registrar Entrada</h2>
+          <form id="entryForm">
+            <div class="form-group">
+              <label>Placa:</label>
+              <input type="text" id="entryPlate" placeholder="ABC123" required>
+            </div>
+            <div class="form-group">
+              <label>Categoría:</label>
+              <select id="entryCategory" required>
+                <option value="">Seleccionar...</option>
+                <% categories.forEach(function(c) { %>
+                  <option value="<%= c.id %>"><%= c.name %> ($<%= c.pricePerMinute %>/min)</option>
+                <% }); %>
+              </select>
+            </div>
+            <button type="submit" class="btn-success">Registrar Entrada</button>
+          </form>
+        </div>
+      </div>
+      <div class="col">
+        <div class="section">
+          <h2>Buscar Vehículo</h2>
+          <div class="form-group">
+            <input type="text" id="searchPlate" placeholder="Buscar por placa..." style="width: 70%; display: inline;">
+            <button onclick="searchVehicle()" class="btn-primary" style="width: 25%;">Buscar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="section">
+      <h2>Vehículos Estacionados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Categoría</th>
+            <th>Entrada</th>
+            <th>Tiempo</th>
+            <th>Registrado por</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody id="activeTableBody">
+          <% records.forEach(function(r) { %>
+            <tr>
+              <td><%= r.plate %></td>
+              <td><%= r.category ? r.category.name : '' %></td>
+              <td><%= new Date(r.entryTime).toLocaleString() %></td>
+              <td data-entry="<%= new Date(r.entryTime).getTime() %>">--</td>
+              <td><%= r.registeredByUser ? r.registeredByUser.name : '' %></td>
+              <td><button onclick="cobrar('<%= r.plate %>')" class="btn-danger">Cobrar</button></td>
+            </tr>
+          <% }); %>
+          <% if (!records || records.length === 0) { %>
+            <tr><td colspan="6">No hay vehículos estacionados.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal" id="cobrarModal">
+    <div class="modal-content">
+      <h3>Confirmar Cobro</h3>
+      <p>¿Estás seguro de cobrar al vehículo <strong id="cobrarPlate"></strong>?</p>
+      <p>Se calculará automáticamente el costo según la tarifa de la categoría.</p>
+      <button onclick="confirmCobrar()" class="btn-danger">Confirmar</button>
+      <button onclick="closeModal()" class="btn-primary">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    var AUTH_TOKEN = '<%- token %>';
+    var API_KEY = 'test-api-key-2024';
+
+    function updateTimers() {
+      document.querySelectorAll('[data-entry]').forEach(function(td) {
+        var entry = parseInt(td.getAttribute('data-entry'));
+        var diff = Math.floor((Date.now() - entry) / 60000);
+        var h = Math.floor(diff / 60);
+        var m = diff % 60;
+        td.textContent = h + 'h ' + m + 'm';
+      });
+    }
+    setInterval(updateTimers, 10000);
+    updateTimers();
+
+    var currentPlate = '';
+
+    function cobrar(plate) {
+      currentPlate = plate;
+      document.getElementById('cobrarPlate').textContent = plate;
+      document.getElementById('cobrarModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('cobrarModal').style.display = 'none';
+      currentPlate = '';
+    }
+
+    function confirmCobrar() {
+      if (!currentPlate) return;
+      fetch('/api/v1/parking/exit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+        body: JSON.stringify({ plate: currentPlate }),
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        closeModal();
+        showMessage('Cobro exitoso - Placa: ' + data.plate + ' | Minutos: ' + data.totalMinutes + ' | Total: $' + parseFloat(data.totalCost).toFixed(2), 'success');
+        setTimeout(function() { location.reload(); }, 1500);
+      })
+      .catch(function() {
+        closeModal();
+        showMessage('Error al procesar el cobro', 'error');
+      });
+    }
+
+    function searchVehicle() {
+      var plate = document.getElementById('searchPlate').value.trim();
+      if (!plate) return;
+      fetch('/api/v1/parking/plate/' + plate, {
+        headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var tbody = document.getElementById('activeTableBody');
+        if (data.length > 0) {
+          tbody.innerHTML = data.map(function(r) {
+            return '<tr><td>' + r.plate + '</td><td>' + (r.category ? r.category.name : '') + '</td><td>' + new Date(r.entryTime).toLocaleString() + '</td><td>' + (r.status === 'active' ? '<span data-entry="' + new Date(r.entryTime).getTime() + '">--</span>' : r.totalMinutes + ' min') + '</td><td>' + (r.registeredByUser ? r.registeredByUser.name : '') + '</td><td>' + (r.status === 'active' ? '<button onclick="cobrar(\'' + r.plate + '\')" class="btn-danger">Cobrar</button>' : '<span style="color:green">$' + parseFloat(r.totalCost).toFixed(2) + '</span>') + '</td></tr>';
+          }).join('');
+          updateTimers();
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6">Sin resultados.</td></tr>';
+        }
+      });
+    }
+
+    document.getElementById('entryForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var plate = document.getElementById('entryPlate').value.trim();
+      var categoryId = document.getElementById('entryCategory').value;
+      if (!plate || !categoryId) return;
+      fetch('/api/v1/parking/entry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+        body: JSON.stringify({ plate: plate, categoryId: parseInt(categoryId) }),
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.statusCode) {
+          showMessage(data.message || 'Error', 'error');
+        } else {
+          showMessage('Entrada registrada: ' + data.plate, 'success');
+          document.getElementById('entryPlate').value = '';
+          setTimeout(function() { location.reload(); }, 1000);
+        }
+      })
+      .catch(function() { showMessage('Error al registrar entrada', 'error'); });
+    });
+
+    function showMessage(msg, type) {
+      document.getElementById('messages').innerHTML = '<div class="' + type + '-msg">' + msg + '</div>';
+      setTimeout(function() { document.getElementById('messages').innerHTML = ''; }, 4000);
+    }
+  </script>
+</body>
+</html>

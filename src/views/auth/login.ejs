@@ -8,7 +8,10 @@
 </head>
 <body>
   <h1><%= title %></h1>
-  <form action="/api/v1/auth/login" method="POST">
+  <% if (error) { %>
+    <p style="color: red;"><%= error %></p>
+  <% } %>
+  <form action="/auth/login" method="POST">
     <div>
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" required>
@@ -21,6 +24,5 @@
       <button type="submit">Iniciar Sesión</button>
     </div>
   </form>
-  <p>No tienes cuenta? <a href="/api/v1/auth/register">Regístrate</a></p>
 </body>
 </html>

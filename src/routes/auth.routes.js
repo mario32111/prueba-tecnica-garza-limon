@@ -8,7 +8,6 @@ const apiRouter = express.Router();
 const viewRouter = express.Router();
 const controller = new AuthController();
 
-// API JSON (prefijo /api/v1/auth)
 apiRouter.post('/login',
   validatorHandler(loginSchema, 'body'),
   passport.authenticate('local', { session: false }),
@@ -20,7 +19,14 @@ apiRouter.post('/register',
   controller.register.bind(controller),
 );
 
-// Vistas EJS (prefijo /auth)
 viewRouter.get('/login', controller.renderLogin.bind(controller));
+
+viewRouter.post('/login',
+  validatorHandler(loginSchema, 'body'),
+  passport.authenticate('local', { session: false }),
+  controller.loginView.bind(controller),
+);
+
+viewRouter.get('/logout', controller.logout.bind(controller));
 
 module.exports = { apiRouter, viewRouter };

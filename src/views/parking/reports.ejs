@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f4f4; }
+    .navbar { background: #2c3e50; color: white; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .navbar a { color: white; text-decoration: none; margin-left: 16px; }
+    .container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    .section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    h2 { margin-bottom: 12px; color: #2c3e50; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 13px; }
+    th { background: #3498db; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 13px; }
+    input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn-primary { background: #3498db; color: white; }
+    .btn-success { background: #27ae60; color: white; }
+    .filters-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .filters-row .form-group { flex: 1; min-width: 140px; }
+    .actions-row { display: flex; gap: 10px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <strong>SGE - Admin</strong>
+    <div>
+      <a href="/dashboard">Dashboard</a>
+      <a href="/parking/reports">Reportes</a>
+      <a href="/categories/list">Categorías</a>
+      <a href="/auth/logout">Salir</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section">
+      <h2>Filtros de Reporte</h2>
+      <div class="filters-row">
+        <div class="form-group">
+          <label>Desde:</label>
+          <input type="date" id="dateFrom">
+        </div>
+        <div class="form-group">
+          <label>Hasta:</label>
+          <input type="date" id="dateTo">
+        </div>
+        <div class="form-group">
+          <label>Placa:</label>
+          <input type="text" id="filterPlate" placeholder="Buscar...">
+        </div>
+        <div class="form-group">
+          <label>Categoría:</label>
+          <select id="filterCategory">
+            <option value="">Todas</option>
+            <% categories.forEach(function(c) { %>
+              <option value="<%= c.id %>"><%= c.name %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Min Costo ($):</label>
+          <input type="number" id="minCost" step="0.01" min="0">
+        </div>
+        <div class="form-group">
+          <label>Max Costo ($):</label>
+          <input type="number" id="maxCost" step="0.01" min="0">
+        </div>
+        <div class="form-group">
+          <label>Min Minutos:</label>
+          <input type="number" id="minMinutes" min="0">
+        </div>
+        <div class="form-group">
+          <label>Max Minutos:</label>
+          <input type="number" id="maxMinutes" min="0">
+        </div>
+        <div class="form-group">
+          <label>Ordenar por:</label>
+          <select id="sortBy">
+            <option value="">Entrada (desc)</option>
+            <option value="plate">Placa</option>
+            <option value="entry_time">Entrada</option>
+            <option value="exit_time">Salida</option>
+            <option value="total_cost">Costo</option>
+            <option value="total_minutes">Minutos</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Orden:</label>
+          <select id="sortOrder">
+            <option value="DESC">Descendente</option>
+            <option value="ASC">Ascendente</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions-row">
+        <button onclick="applyFilters()" class="btn-primary">Aplicar Filtros</button>
+        <button onclick="exportExcel()" class="btn-success">Exportar Todo a Excel</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Resultados</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Placa</th>
+            <th>Categoría</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Minutos</th>
+            <th>Costo ($)</th>
+            <th>Estado</th>
+            <th>Registrado por</th>
+            <th>Exportar</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr><td colspan="9">Aplica filtros para ver resultados.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    var AUTH_TOKEN = '<%- token %>';
+    var API_KEY = 'test-api-key-2024';
+
+    function buildQueryParams() {
+      var params = new URLSearchParams();
+      var fields = ['dateFrom','dateTo','minCost','maxCost','minMinutes','maxMinutes','sortBy','sortOrder'];
+      fields.forEach(function(f) {
+        var val = document.getElementById(f).value;
+        if (val) params.append(f, val);
+      });
+      var plate = document.getElementById('filterPlate').value.trim();
+      if (plate) params.append('plate', plate);
+      var cat = document.getElementById('filterCategory').value;
+      if (cat) params.append('categoryId', cat);
+      var sortBy = document.getElementById('sortBy').value;
+      if (sortBy) params.set('sortBy', sortBy);
+      return params.toString();
+    }
+
+    function applyFilters() {
+      var qs = buildQueryParams();
+      fetch('/api/v1/parking?' + qs, {
+        headers: { 'api': API_KEY, 'Authorization': 'Bearer ' + AUTH_TOKEN },
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var tbody = document.getElementById('resultsBody');
+        if (data.length > 0) {
+          tbody.innerHTML = data.map(function(r) {
+            return '<tr>' +
+              '<td>' + r.plate + '</td>' +
+              '<td>' + (r.category ? r.category.name : '') + '</td>' +
+              '<td>' + new Date(r.entryTime).toLocaleString() + '</td>' +
+              '<td>' + (r.exitTime ? new Date(r.exitTime).toLocaleString() : 'Activo') + '</td>' +
+              '<td>' + (r.totalMinutes || 0) + '</td>' +
+              '<td>$' + parseFloat(r.totalCost || 0).toFixed(2) + '</td>' +
+              '<td>' + (r.status === 'active' ? 'Activo' : 'Completado') + '</td>' +
+              '<td>' + (r.registeredByUser ? r.registeredByUser.name : '') + '</td>' +
+              '<td><button onclick="exportPlate(\'' + r.plate + '\')" class="btn-success" style="font-size:11px;padding:4px 8px;">Excel</button></td>' +
+              '</tr>';
+          }).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="9">Sin resultados.</td></tr>';
+        }
+      });
+    }
+
+    function exportExcel() {
+      var qs = buildQueryParams();
+      var sep = qs ? '&' : '';
+      window.open('/api/v1/parking/export?' + qs + sep + 'api=' + API_KEY + '&token=' + AUTH_TOKEN, '_blank');
+    }
+
+    function exportPlate(plate) {
+      window.open('/api/v1/parking/export/' + plate + '?api=' + API_KEY + '&token=' + AUTH_TOKEN, '_blank');
+    }
+  </script>
+</body>
+</html>

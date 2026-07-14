@@ -10,18 +10,32 @@ const UserSchema = {
     allowNull: false,
   },
   email: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     unique: true,
     allowNull: false,
   },
   password: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    field: 'password_hash',
+  },
+  name: {
+    type: DataTypes.STRING(100),
     allowNull: false,
   },
   role: {
-    type: DataTypes.ENUM('admin', 'user'),
+    type: DataTypes.STRING(20),
     allowNull: false,
-    defaultValue: 'user',
+    defaultValue: 'employee',
+    validate: {
+      isIn: [['admin', 'employee']],
+    },
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+    field: 'is_active',
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -38,7 +52,12 @@ const UserSchema = {
 };
 
 class User extends Model {
-  static associate() {}
+  static associate(models) {
+    this.hasMany(models.ParkingRecord, {
+      foreignKey: 'registered_by',
+      as: 'parkingRecords',
+    });
+  }
 
   static config(sequelize) {
     return {

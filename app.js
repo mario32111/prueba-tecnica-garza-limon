@@ -13,18 +13,7 @@ const app = express();
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
 
-const whitelist = ['http://localhost:8080'];
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (whitelist.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('no permitido'));
-    }
-  },
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

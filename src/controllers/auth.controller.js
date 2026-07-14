@@ -1,6 +1,5 @@
 const AuthService = require('../services/auth.service');
 const UserService = require('../services/user.service');
-const bcrypt = require('bcrypt');
 
 const authService = new AuthService();
 const userService = new UserService();
@@ -8,8 +7,21 @@ const userService = new UserService();
 class AuthController {
   async login(req, res, next) {
     try {
-      const { user, token } = authService.signToken(req.user);
+      const { user, token } = await authService.signToken(req.user);
       res.json({ user, token });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async loginView(req, res, next) {
+    try {
+      const { user, token } = await authService.signToken(req.user);
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      res.redirect('/dashboard');
     } catch (error) {
       next(error);
     }
@@ -18,9 +30,7 @@ class AuthController {
   async register(req, res, next) {
     try {
       const { email, password } = req.body;
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await userService.create({ email, password: hashedPassword, role: 'user' });
-      delete user.dataValues.password;
+      const user = await userService.create({ email, password, role: 'employee' });
       res.status(201).json(user);
     } catch (error) {
       next(error);
@@ -28,7 +38,12 @@ class AuthController {
   }
 
   async renderLogin(req, res) {
-    res.render('auth/login', { title: 'Iniciar Sesión' });
+    res.render('auth/login', { title: 'Iniciar Sesión', error: null });
+  }
+
+  async logout(req, res) {
+    res.clearCookie('token');
+    res.redirect('/auth/login');
   }
 }
 
